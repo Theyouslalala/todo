@@ -1,0 +1,25 @@
+# Node
+node_modules/
+npm-debug.log*
+
+# WeChat mini-program
+miniprogram_npm/
+.idea/
+.vscode/
+
+# Python
+ai-service/__pycache__/
+ai-service/*.pyc
+ai-service/.env
+ai-service/venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Cloud functions node_modules
+cloudfunctions/*/node_modules/
+
+# Temporary
+*.tmp
+*.log
