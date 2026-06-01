@@ -1,0 +1,46 @@
+<view class="container">
+  <view class="month-nav">
+    <view class="nav-btn" bindtap="prevMonth">◀</view>
+    <view class="month-title">{{year}}年{{month}}月</view>
+    <view class="nav-btn" bindtap="nextMonth">▶</view>
+  </view>
+
+  <view class="week-header">
+    <view class="week-item" wx:for="{{weekDays}}" wx:key="*this">{{item}}</view>
+  </view>
+
+  <view class="calendar-grid">
+    <view
+      wx:for="{{calendarDays}}"
+      wx:key="day"
+      class="day-cell {{item.isToday ? 'today' : ''}} {{item.isSelected ? 'selected' : ''}} {{item.isEmpty ? 'empty' : ''}} {{item.hasTodos ? 'has-todos' : ''}}"
+      bindtap="onDayTap"
+      data-day="{{item}}"
+    >
+      <text class="day-number">{{item.day}}</text>
+      <text class="lunar-day" wx:if="{{item.lunarDay}}">{{item.lunarDay}}</text>
+      <view class="todo-dots" wx:if="{{item.todoCount > 0}}">
+        <view class="dot" wx:for="{{item.todoColors}}" wx:for-item="color" wx:key="*this" style="background: {{color}}"></view>
+      </view>
+    </view>
+  </view>
+
+  <view class="day-todos" wx:if="{{selectedDayTodos.length > 0}}">
+    <view class="day-todos-title">{{selectedDate}} 的事项</view>
+    <view
+      wx:for="{{selectedDayTodos}}"
+      wx:key="_id"
+      class="day-todo-item"
+      bindtap="onTodoTap"
+      data-id="{{item._id}}"
+    >
+      <view class="todo-dot" style="background: {{item.color === 'red' ? '#ff4d4f' : item.color === 'blue' ? '#4A90D9' : item.color === 'green' ? '#52c41a' : '#faad14'}}"></view>
+      <text class="todo-title">{{item.title}}</text>
+      <text class="todo-time" wx:if="{{item.dueTime}}">{{item.dueTime}}</text>
+    </view>
+  </view>
+
+  <view class="empty-day" wx:if="{{selectedDay && selectedDayTodos.length === 0}}">
+    <text>该日暂无事项</text>
+  </view>
+</view>
