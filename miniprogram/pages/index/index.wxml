@@ -30,7 +30,7 @@
 
   <view class="todo-list" wx:elif="{{todos.length > 0}}">
     <todo-card wx:for="{{todos}}" wx:key="_id" todo="{{item}}" members="{{members}}"
-      bind:complete="onTodoComplete" bind:delete="onTodoDelete" bind:tap="onTodoTap" />
+      bind:complete="onTodoComplete" bind:delete="onTodoDelete" bind:todotap="onTodoTap" />
   </view>
 
   <view class="empty-state" wx:else>

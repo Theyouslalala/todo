@@ -38,7 +38,7 @@ Component({
         this.setData({ expanded: false })
         return
       }
-      this.triggerEvent('tap', { todo: this.data.todo })
+      this.triggerEvent('todotap', { todo: this.data.todo })
     },
     onComplete() {
       this.setData({ expanded: false })

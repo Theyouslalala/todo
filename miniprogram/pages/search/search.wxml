@@ -4,7 +4,7 @@
     <text class="search-btn" bindtap="onSearch">搜索</text>
   </view>
   <view class="results">
-    <todo-card wx:for="{{results}}" wx:key="_id" todo="{{item}}" members="{{members}}" bind:tap="onTodoTap" />
+    <todo-card wx:for="{{results}}" wx:key="_id" todo="{{item}}" members="{{members}}" bind:todotap="onTodoTap" />
   </view>
   <view class="empty-state" wx:if="{{searched && results.length === 0}}"><text>未找到相关事项</text></view>
 </view>
