@@ -170,7 +170,7 @@ Page({
         try {
           await notification.requestSubscribe(config.NOTIFICATION_TEMPLATE_ID)
         } catch (e) {
-          console.log('Notification subscription skipped')
+          console.log('Notification subscription skipped', e)
         }
       }
       setTimeout(() => { wx.navigateBack() }, 1500)

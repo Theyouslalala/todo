@@ -105,7 +105,7 @@ async function createTodo(openid, event) {
 
 async function updateTodo(openid, event) {
   const user = await getUserAndFamily(openid)
-  const { todoId, action, _testOpenid } = event
+  const { todoId } = event
 
   const allowedFields = [
     'title', 'description', 'color', 'priority', 'category',
@@ -118,6 +118,16 @@ async function updateTodo(openid, event) {
     if (event[key] !== undefined) {
       updateFields[key] = event[key]
     }
+  }
+
+  // 鉴权：验证待办属于当前用户的家庭组
+  try {
+    const todo = await db.collection('reminders').doc(todoId).get()
+    if (!todo.data || todo.data.familyGroupId !== user.familyGroupId) {
+      return { code: -1, msg: 'Todo not found' }
+    }
+  } catch (err) {
+    return { code: -1, msg: 'Todo not found' }
   }
 
   await db.collection('reminders').doc(todoId).update({
@@ -136,7 +146,16 @@ async function deleteTodo(openid, event) {
   const user = await getUserAndFamily(openid)
   const { todoId } = event
 
-  const todo = await db.collection('reminders').doc(todoId).get()
+  // 鉴权：验证待办属于当前用户的家庭组
+  let todo
+  try {
+    todo = await db.collection('reminders').doc(todoId).get()
+    if (!todo.data || todo.data.familyGroupId !== user.familyGroupId) {
+      return { code: -1, msg: 'Todo not found' }
+    }
+  } catch (err) {
+    return { code: -1, msg: 'Todo not found' }
+  }
 
   await db.collection('reminders').doc(todoId).update({
     data: { deletedAt: db.serverDate() }
@@ -154,6 +173,16 @@ async function restoreTodo(openid, event) {
   const user = await getUserAndFamily(openid)
   const { todoId } = event
 
+  // 鉴权：验证待办属于当前用户的家庭组
+  try {
+    const todo = await db.collection('reminders').doc(todoId).get()
+    if (!todo.data || todo.data.familyGroupId !== user.familyGroupId) {
+      return { code: -1, msg: 'Todo not found' }
+    }
+  } catch (err) {
+    return { code: -1, msg: 'Todo not found' }
+  }
+
   await db.collection('reminders').doc(todoId).update({
     data: { deletedAt: null }
   })
@@ -165,7 +194,16 @@ async function completeTodo(openid, event) {
   const user = await getUserAndFamily(openid)
   const { todoId } = event
 
-  const todo = await db.collection('reminders').doc(todoId).get()
+  // 鉴权：验证待办属于当前用户的家庭组
+  let todo
+  try {
+    todo = await db.collection('reminders').doc(todoId).get()
+    if (!todo.data || todo.data.familyGroupId !== user.familyGroupId) {
+      return { code: -1, msg: 'Todo not found' }
+    }
+  } catch (err) {
+    return { code: -1, msg: 'Todo not found' }
+  }
 
   await db.collection('reminders').doc(todoId).update({
     data: {
@@ -242,7 +280,12 @@ async function getTodosByMonth(openid, event) {
 
 async function searchTodos(openid, event) {
   const user = await getUserAndFamily(openid)
-  const { keyword, skip = 0 } = event
+  let { keyword, skip = 0 } = event
+
+  // 防止 ReDoS：转义用户输入中的正则特殊字符
+  if (typeof keyword === 'string') {
+    keyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  }
 
   const res = await db.collection('reminders')
     .where({

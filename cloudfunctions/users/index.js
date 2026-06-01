@@ -73,14 +73,14 @@ async function login(openid, event) {
 }
 
 async function updateProfile(openid, event) {
-  const { name, avatar, role } = event
+  const { name, avatar } = event
   const user = await db.collection('users').where({ openid }).get()
   if (user.data.length === 0) return { code: -1, msg: 'User not found' }
 
   const updateData = {}
   if (name !== undefined) updateData.name = name
   if (avatar !== undefined) updateData.avatar = avatar
-  if (role !== undefined) updateData.role = role
+  // 注意：不允许客户端直接修改 role 字段，防止越权提权
 
   await db.collection('users').doc(user.data[0]._id).update({
     data: updateData

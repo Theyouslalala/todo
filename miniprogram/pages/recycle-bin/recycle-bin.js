@@ -1,4 +1,5 @@
 const api = require('../../utils/api')
+
 Page({
   data: { deletedTodos: [] },
   onLoad() { this.loadDeleted() },

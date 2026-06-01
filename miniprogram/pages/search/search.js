@@ -1,4 +1,5 @@
 const api = require('../../utils/api')
+
 Page({
   data: { keyword: '', results: [], members: [], searched: false },
   onLoad() { this.loadMembers() },

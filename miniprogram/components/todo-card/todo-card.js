@@ -41,11 +41,11 @@ Component({
       }
       this.triggerEvent('tap', { todo: this.data.todo })
     },
-    onComplete(e) {
+    onComplete() {
       this.setData({ expanded: false })
       this.triggerEvent('complete', { todoId: this.data.todo._id })
     },
-    onDelete(e) {
+    onDelete() {
       this.setData({ expanded: false })
       this.triggerEvent('delete', { todoId: this.data.todo._id })
     }

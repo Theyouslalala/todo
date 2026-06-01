@@ -1,4 +1,5 @@
 const api = require('../../utils/api')
+
 Page({
   data: { members: [], inviteCode: '', joinCode: '' },
   onLoad() { this.loadData() },
@@ -23,3 +24,4 @@ Page({
     if (res && res.code === 0) { wx.showToast({ title: '加入成功', icon: 'success' }); this.loadData() }
   }
 })
+
