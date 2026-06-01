@@ -16,7 +16,7 @@ Page({
   },
 
   async onLoad() {
-    await app.waitForLogin()
+    await app.ensureLogin()
     const now = new Date()
     this.setData({ year: now.getFullYear(), month: now.getMonth() + 1 })
     this._dataLoaded = true

@@ -16,7 +16,7 @@ Page({
   },
 
   async onLoad() {
-    await app.waitForLogin()
+    await app.ensureLogin()
     const now = new Date()
     const weekDays = ['日', '一', '二', '三', '四', '五', '六']
     this.setData({

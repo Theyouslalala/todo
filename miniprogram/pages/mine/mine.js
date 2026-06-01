@@ -10,7 +10,7 @@ Page({
   },
 
   async onLoad() {
-    await app.waitForLogin()
+    await app.ensureLogin()
     this._dataLoaded = true
     await this.loadUserInfo()
   },

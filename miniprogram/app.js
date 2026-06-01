@@ -9,12 +9,17 @@ App({
       env: 'cloud1-d7get2p965ac6f291',
       traceUser: true
     })
-
-    // Fire and forget - don't block app launch
-    this.login()
   },
 
-  async login() {
+  async ensureLogin() {
+    if (this.globalData.userInfo) return this.globalData.userInfo
+    if (this._loginPromise) return this._loginPromise
+
+    this._loginPromise = this._doLogin()
+    return this._loginPromise
+  },
+
+  async _doLogin() {
     try {
       let res = await wx.cloud.callFunction({
         name: 'users',
@@ -35,26 +40,15 @@ App({
       }
     } catch (err) {
       console.error('Login failed:', err)
-    } finally {
-      this.globalData.loginDone = true
     }
+
+    return this.globalData.userInfo
   },
 
   globalData: {
     userInfo: null,
     needLogin: false,
-    loginDone: false,
     testMode: false,
     testOpenid: ''
-  },
-
-  async waitForLogin() {
-    if (this.globalData.userInfo) return this.globalData.userInfo
-    // Wait for login with 8-second max
-    const start = Date.now()
-    while (!this.globalData.loginDone && Date.now() - start < 8000) {
-      await new Promise(resolve => setTimeout(resolve, 100))
-    }
-    return this.globalData.userInfo
   }
 })
