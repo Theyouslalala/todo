@@ -1,0 +1,35 @@
+<view class="container">
+  <view class="search-bar" bindtap="goSearch">
+    <text class="search-icon">🔍</text>
+    <text class="search-placeholder">搜索待办事项...</text>
+  </view>
+
+  <category-filter
+    current="{{currentCategory}}"
+    bind:change="onCategoryChange"
+  />
+
+  <view class="todo-list" wx:if="{{todos.length > 0}}">
+    <todo-card
+      wx:for="{{todos}}"
+      wx:key="_id"
+      todo="{{item}}"
+      members="{{members}}"
+      bind:tap="onTodoTap"
+      bind:complete="onTodoComplete"
+      bind:delete="onTodoDelete"
+    />
+  </view>
+
+  <view class="empty-state" wx:if="{{!loading && todos.length === 0}}">
+    <text class="empty-icon">📋</text>
+    <text>今日暂无待办事项</text>
+    <text class="empty-hint">点击右下角 + 添加</text>
+  </view>
+
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <quick-add bind:add="onQuickAdd" />
+</view>

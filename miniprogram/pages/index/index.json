@@ -1,0 +1,9 @@
+{
+  "usingComponents": {
+    "todo-card": "../../components/todo-card/todo-card",
+    "category-filter": "../../components/category-filter/category-filter",
+    "quick-add": "../../components/quick-add/quick-add"
+  },
+  "navigationBarTitleText": "今日待办",
+  "enablePullDownRefresh": true
+}
