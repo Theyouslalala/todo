@@ -20,7 +20,7 @@ Page({
       const members = membersRes && membersRes.data ? membersRes.data : []
       const assignee = members.find(m => m._id === todo.assignedTo)
       let lunarDateStr = ''
-      if (todo.isLunar && todo.dueDate) {
+      if (todo.dueDate) {
         const [y, m, d] = todo.dueDate.split('-').map(Number)
         const lunarInfo = lunar.solarToLunar(y, m, d)
         lunarDateStr = lunarInfo.fullName

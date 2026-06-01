@@ -41,7 +41,9 @@ App({
 
   globalData: {
     userInfo: null,
-    needLogin: false
+    needLogin: false,
+    testMode: false,
+    testOpenid: ''
   },
 
   // Wait for login to complete before calling API

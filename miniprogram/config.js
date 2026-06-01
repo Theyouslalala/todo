@@ -1,0 +1,3 @@
+module.exports = {
+  NOTIFICATION_TEMPLATE_ID: 'YOUR_TEMPLATE_ID'
+}

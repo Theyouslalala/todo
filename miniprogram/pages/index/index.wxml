@@ -1,34 +1,42 @@
 <view class="container">
-  <view class="search-bar" bindtap="goSearch">
-    <text class="search-icon">🔍</text>
+  <view class="home-header bg-gradient-primary">
+    <text class="header-greeting">{{greeting}}</text>
+    <text class="header-date">{{todayStr}}</text>
+    <text class="header-lunar">{{lunarStr}}</text>
+  </view>
+
+  <view class="search-bar hover-light" bindtap="goSearch">
+    <text class="search-icon">搜索</text>
     <text class="search-placeholder">搜索待办事项...</text>
   </view>
 
-  <category-filter
-    current="{{currentCategory}}"
-    bind:change="onCategoryChange"
-  />
-
-  <view class="todo-list" wx:if="{{todos.length > 0}}">
-    <todo-card
-      wx:for="{{todos}}"
-      wx:key="_id"
-      todo="{{item}}"
-      members="{{members}}"
-      bind:tap="onTodoTap"
-      bind:complete="onTodoComplete"
-      bind:delete="onTodoDelete"
-    />
+  <view class="view-toggle">
+    <view class="toggle-item {{viewMode === 'today' ? 'active' : ''}}" bindtap="onViewModeChange" data-mode="today">今日待办</view>
+    <view class="toggle-item {{viewMode === 'all' ? 'active' : ''}}" bindtap="onViewModeChange" data-mode="all">所有待办</view>
   </view>
 
-  <view class="empty-state" wx:if="{{!loading && todos.length === 0}}">
-    <text class="empty-icon">📋</text>
-    <text>今日暂无待办事项</text>
+  <category-filter current="{{currentCategory}}" bind:categorychange="onCategoryChange" />
+
+  <view class="skeleton-list" wx:if="{{loading}}">
+    <view class="skeleton-card" wx:for="{{[1,2,3]}}" wx:key="*this">
+      <view class="skeleton-header">
+        <view class="skeleton skeleton-dot"></view>
+        <view class="skeleton skeleton-title"></view>
+      </view>
+      <view class="skeleton skeleton-body"></view>
+      <view class="skeleton skeleton-footer"></view>
+    </view>
+  </view>
+
+  <view class="todo-list" wx:elif="{{todos.length > 0}}">
+    <todo-card wx:for="{{todos}}" wx:key="_id" todo="{{item}}" members="{{members}}"
+      bind:complete="onTodoComplete" bind:delete="onTodoDelete" bind:tap="onTodoTap" />
+  </view>
+
+  <view class="empty-state" wx:else>
+    <view class="empty-icon-wrapper">📋</view>
+    <text class="empty-text">{{viewMode === 'today' ? '今日暂无待办事项' : '暂无待办事项'}}</text>
     <text class="empty-hint">点击右下角 + 添加</text>
-  </view>
-
-  <view class="loading" wx:if="{{loading}}">
-    <text>加载中...</text>
   </view>
 
   <quick-add bind:add="onQuickAdd" />

@@ -1,6 +1,10 @@
 const api = {
   async call(name, data = {}) {
     try {
+      const app = getApp()
+      if (app && app.globalData.testMode && app.globalData.testOpenid) {
+        data._testOpenid = app.globalData.testOpenid
+      }
       const res = await wx.cloud.callFunction({ name, data })
       if (res.result.code === -1) {
         wx.showToast({ title: res.result.msg || '操作失败', icon: 'none' })
@@ -26,7 +30,8 @@ const api = {
     search: (keyword, skip) => api.call('todos', { action: 'search', keyword, skip }),
     getDeleted: () => api.call('todos', { action: 'getDeleted' }),
     permanentDelete: (todoId) => api.call('todos', { action: 'permanentDelete', todoId }),
-    getById: (todoId) => api.call('todos', { action: 'getById', todoId })
+    getById: (todoId) => api.call('todos', { action: 'getById', todoId }),
+    getAll: () => api.call('todos', { action: 'getAll' })
   },
 
   users: {

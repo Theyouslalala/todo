@@ -1,24 +1,28 @@
-<view class="todo-card priority-{{todo.priority}}" bindtap="onTap">
-  <view class="card-header">
-    <view class="color-dot color-{{todo.color}}"></view>
-    <view class="card-title">{{todo.title}}</view>
-    <view class="card-category">{{categoryName}}</view>
-  </view>
-  <view class="card-body" wx:if="{{todo.description || todo.quantity}}">
-    <text wx:if="{{todo.description}}" class="card-desc">{{todo.description}}</text>
-    <text wx:if="{{todo.quantity}}" class="card-quantity">数量: {{todo.quantity}}</text>
-  </view>
-  <view class="card-footer">
-    <view class="card-time" wx:if="{{todo.dueTime}}">
-      <text class="time-icon">⏰</text>
-      <text>{{todo.dueTime}}</text>
+<view class="todo-card priority-{{todo.priority}} {{todo.status === 'completed' ? 'completed' : ''}} {{expanded ? 'expanded' : ''}}"
+  bindlongpress="onLongPress" bindtap="onCardTap">
+  <view class="color-bar" style="background: {{todo.color === 'red' ? '#ff4d4f' : todo.color === 'green' ? '#52c41a' : todo.color === 'yellow' ? '#faad14' : '#4A90D9'}}"></view>
+  <view class="card-content">
+    <view class="card-header">
+      <text class="card-title">{{todo.title}}</text>
+      <view class="card-category">{{todo.category === 'daily' ? '日常' : todo.category === 'shopping' ? '购物' : todo.category === 'family' ? '家庭' : todo.category === 'bill' ? '账单' : '其他'}}</view>
     </view>
-    <view class="card-assignee">
-      <text class="assignee-avatar">{{assigneeInitial}}</text>
+    <view class="card-body" wx:if="{{todo.description || todo.quantity}}">
+      <text class="card-desc" wx:if="{{todo.description}}">{{todo.description}}</text>
+      <text class="card-quantity" wx:if="{{todo.quantity}}">数量: {{todo.quantity}}</text>
     </view>
-    <view class="card-actions">
-      <view class="action-btn complete-btn" catchtap="onComplete">✓ 完成</view>
-      <view class="action-btn delete-btn" catchtap="onDelete">删除</view>
+    <view class="card-footer">
+      <view class="card-meta">
+        <text class="card-date" wx:if="{{todo.dueDate}}">{{todo.dueDate}}</text>
+        <text class="card-lunar" wx:if="{{lunarDateStr}}">{{lunarDateStr}}</text>
+        <text class="card-time" wx:if="{{todo.dueTime}}">{{todo.dueTime}}</text>
+      </view>
+      <view class="card-assignee" wx:if="{{todo.assignedTo}}">
+        <view class="assignee-avatar">{{todo._assigneeName || '?'}}</view>
+      </view>
+    </view>
+    <view class="card-actions" wx:if="{{expanded}}">
+      <view class="action-btn action-complete" catchtap="onComplete" data-action="complete">完成</view>
+      <view class="action-btn action-delete" catchtap="onDelete" data-action="delete">删除</view>
     </view>
   </view>
 </view>

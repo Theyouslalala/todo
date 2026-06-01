@@ -8,7 +8,8 @@
     "pages/family/family",
     "pages/activity-log/activity-log",
     "pages/recycle-bin/recycle-bin",
-    "pages/search/search"
+    "pages/search/search",
+    "pages/settings/settings"
   ],
   "window": {
     "backgroundTextStyle": "light",

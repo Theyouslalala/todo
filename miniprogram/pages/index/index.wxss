@@ -1,39 +1,142 @@
 .container {
+  padding-bottom: 120rpx;
   min-height: 100vh;
   background: #f5f5f5;
-  padding-bottom: 120rpx;
 }
-.search-bar {
-  display: flex;
-  align-items: center;
-  margin: 24rpx;
-  padding: 16rpx 24rpx;
-  background: #fff;
-  border-radius: 12rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+
+.home-header {
+  padding: 48rpx 32rpx 36rpx;
+  color: #fff;
+  border-radius: 0 0 32rpx 32rpx;
 }
-.search-icon {
-  margin-right: 12rpx;
+
+.header-greeting {
   font-size: 28rpx;
+  opacity: 0.9;
+  display: block;
 }
-.search-placeholder {
-  color: #999;
-  font-size: 28rpx;
-}
-.todo-list {
-  padding-bottom: 40rpx;
-}
-.empty-icon {
-  font-size: 80rpx;
-  margin-bottom: 16rpx;
-}
-.empty-hint {
-  font-size: 24rpx;
-  color: #bbb;
+
+.header-date {
+  font-size: 40rpx;
+  font-weight: 700;
+  display: block;
   margin-top: 8rpx;
 }
-.loading {
+
+.header-lunar {
+  font-size: 24rpx;
+  opacity: 0.8;
+  margin-top: 4rpx;
+  display: block;
+}
+
+.search-bar {
+  margin: 24rpx;
+  padding: 20rpx 24rpx;
+  background: #fff;
+  border-radius: 12rpx;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+}
+
+.search-icon {
+  font-size: 28rpx;
+  color: #4A90D9;
+  margin-right: 12rpx;
+  font-weight: 600;
+}
+
+.search-placeholder {
+  font-size: 28rpx;
+  color: #bbb;
+}
+
+.view-toggle {
+  display: flex;
+  margin: 0 24rpx 16rpx;
+  background: #f0f4f8;
+  border-radius: 12rpx;
+  padding: 6rpx;
+}
+
+.toggle-item {
+  flex: 1;
   text-align: center;
-  padding: 40rpx;
+  padding: 16rpx 0;
+  font-size: 28rpx;
+  color: #666;
+  border-radius: 10rpx;
+  transition: all 0.2s;
+}
+
+.toggle-item.active {
+  background: #fff;
+  color: #4A90D9;
+  font-weight: 600;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.08);
+}
+
+.todo-list {
+  padding: 0 24rpx;
+}
+
+/* Skeleton loading */
+.skeleton-list {
+  padding: 0 24rpx;
+}
+
+.skeleton-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+}
+
+.skeleton-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.skeleton-dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  margin-right: 16rpx;
+}
+
+.skeleton-title {
+  width: 60%;
+  height: 32rpx;
+}
+
+.skeleton-body {
+  width: 100%;
+  height: 24rpx;
+}
+
+.skeleton-footer {
+  width: 40%;
+  height: 24rpx;
+  margin-top: 12rpx;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 120rpx 0;
+}
+
+.empty-text {
+  font-size: 30rpx;
   color: #999;
+  margin-top: 16rpx;
+}
+
+.empty-hint {
+  font-size: 24rpx;
+  color: #ccc;
+  margin-top: 8rpx;
 }

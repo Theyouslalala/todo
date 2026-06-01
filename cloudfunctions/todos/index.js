@@ -5,7 +5,7 @@ const _ = db.command
 
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext()
-  const openid = wxContext.OPENID
+  const openid = event._testOpenid || wxContext.OPENID
   const { action } = event
 
   switch (action) {
@@ -33,6 +33,8 @@ exports.main = async (event, context) => {
       return await permanentDeleteTodo(openid, event)
     case 'getById':
       return await getTodoById(openid, event)
+    case 'getAll':
+      return await getAllTodos(openid)
     default:
       return { code: -1, msg: 'Unknown action' }
   }
@@ -275,6 +277,21 @@ async function permanentDeleteTodo(openid, event) {
 
   await db.collection('reminders').doc(todoId).remove()
   return { code: 0, msg: 'Permanently deleted' }
+}
+
+async function getAllTodos(openid) {
+  const user = await getUserAndFamily(openid)
+  const res = await db.collection('reminders')
+    .where({
+      familyGroupId: user.familyGroupId,
+      status: 'pending',
+      deletedAt: null
+    })
+    .orderBy('dueDate', 'asc')
+    .orderBy('dueTime', 'asc')
+    .limit(100)
+    .get()
+  return { code: 0, data: res.data }
 }
 
 async function getTodoById(openid, event) {

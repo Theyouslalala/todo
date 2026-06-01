@@ -5,7 +5,7 @@
       <text class="detail-title">{{todo.title}}</text>
     </view>
     <view class="detail-row"><text class="row-label">日期</text><text class="row-value">{{todo.dueDate}} {{todo.dueTime}}</text></view>
-    <view class="detail-row" wx:if="{{todo.isLunar}}"><text class="row-label">农历</text><text class="row-value">{{lunarDateStr}}</text></view>
+    <view class="detail-row" wx:if="{{lunarDateStr}}"><text class="row-label">农历</text><text class="row-value">{{lunarDateStr}}</text></view>
     <view class="detail-row"><text class="row-label">分类</text><text class="row-value">{{categoryName}}</text></view>
     <view class="detail-row"><text class="row-label">负责人</text><text class="row-value">{{assigneeName}}</text></view>
     <view class="detail-row"><text class="row-label">状态</text><text class="row-value {{todo.status === 'completed' ? 'status-done' : ''}}">{{todo.status === 'completed' ? '已完成' : '待办中'}}</text></view>

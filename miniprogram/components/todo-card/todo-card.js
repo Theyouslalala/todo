@@ -1,6 +1,4 @@
-const categoryMap = {
-  daily: '日常', shopping: '购物', family: '家庭', bill: '账单', other: '其他'
-}
+const lunar = require('../../utils/lunar')
 
 Component({
   properties: {
@@ -9,41 +7,49 @@ Component({
   },
 
   data: {
-    categoryName: '',
-    assigneeInitial: ''
+    expanded: false,
+    lunarDateStr: '',
+    _assigneeName: ''
   },
 
   observers: {
-    'todo, members': function (todo, members) {
-      if (!todo) return
-      this.setData({
-        categoryName: categoryMap[todo.category] || '其他',
-        assigneeInitial: this.getAssigneeInitial(todo.assignedTo, members)
-      })
+    'todo.dueDate': function(dueDate) {
+      if (dueDate) {
+        const parts = dueDate.split('-').map(Number)
+        const info = lunar.solarToLunar(parts[0], parts[1], parts[2])
+        this.setData({ lunarDateStr: info.monthName + '月' + info.dayName })
+      }
+    },
+    'todo.assignedTo': function(assignedTo) {
+      if (assignedTo && this.data.members) {
+        const member = this.data.members.find(m => m._id === assignedTo)
+        if (member) {
+          this.setData({ '_assigneeName': member.name[0] })
+        }
+      }
     }
   },
 
   methods: {
-    getAssigneeInitial(assignedTo, members) {
-      const member = members.find(m => m._id === assignedTo)
-      return member ? member.name.charAt(0) : '?'
+    onLongPress() {
+      this.setData({ expanded: !this.data.expanded })
     },
-    onTap() {
-      this.triggerEvent('tap', { todo: this.properties.todo })
-    },
-    onComplete() {
-      this.triggerEvent('complete', { todoId: this.properties.todo._id })
-    },
-    onDelete() {
-      wx.showModal({
-        title: '确认删除',
-        content: `确定删除"${this.properties.todo.title}"吗？`,
-        success: (res) => {
-          if (res.confirm) {
-            this.triggerEvent('delete', { todoId: this.properties.todo._id })
-          }
+    onCardTap(e) {
+      if (this.data.expanded) {
+        const target = e.currentTarget.dataset
+        if (!target.action) {
+          this.setData({ expanded: false })
         }
-      })
+      }
+      this.triggerEvent('tap', { todo: this.data.todo })
+    },
+    onComplete(e) {
+      this.setData({ expanded: false })
+      this.triggerEvent('complete', { todoId: this.data.todo._id })
+    },
+    onDelete(e) {
+      this.setData({ expanded: false })
+      this.triggerEvent('delete', { todoId: this.data.todo._id })
     }
   }
 })

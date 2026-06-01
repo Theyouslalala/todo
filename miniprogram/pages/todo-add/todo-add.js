@@ -1,4 +1,7 @@
 const api = require('../../utils/api')
+const lunar = require('../../utils/lunar')
+const notification = require('../../utils/notification')
+const config = require('../../config')
 
 Page({
   data: {
@@ -16,6 +19,7 @@ Page({
     enableNotification: true,
     notifyBefore: 15,
     showMore: false,
+    lunarPreview: '',
     members: [],
     isEdit: false,
     categories: [
@@ -56,6 +60,9 @@ Page({
     } else {
       const today = new Date().toISOString().split('T')[0]
       this.setData({ dueDate: today })
+      const parts = today.split('-').map(Number)
+      const info = lunar.solarToLunar(parts[0], parts[1], parts[2])
+      this.setData({ lunarPreview: info.monthName + '月' + info.dayName })
     }
     this.loadMembers()
   },
@@ -98,7 +105,13 @@ Page({
   onTitleInput(e) { this.setData({ title: e.detail.value }) },
   onDescInput(e) { this.setData({ description: e.detail.value }) },
   onQuantityInput(e) { this.setData({ quantity: e.detail.value }) },
-  onDateChange(e) { this.setData({ dueDate: e.detail.value }) },
+  onDateChange(e) {
+    const date = e.detail.value
+    this.setData({ dueDate: date })
+    const parts = date.split('-').map(Number)
+    const info = lunar.solarToLunar(parts[0], parts[1], parts[2])
+    this.setData({ lunarPreview: info.monthName + '月' + info.dayName })
+  },
   onTimeChange(e) { this.setData({ dueTime: e.detail.value }) },
   onCategorySelect(e) { this.setData({ category: e.currentTarget.dataset.value }) },
   onColorSelect(e) { this.setData({ color: e.currentTarget.dataset.value }) },
@@ -145,6 +158,14 @@ Page({
 
     if (res && res.code === 0) {
       wx.showToast({ title: this.data.isEdit ? '更新成功' : '添加成功', icon: 'success' })
+      // Request notification subscription for new todos with notifications enabled
+      if (!this.data.isEdit && this.data.enableNotification && config.NOTIFICATION_TEMPLATE_ID !== 'YOUR_TEMPLATE_ID') {
+        try {
+          await notification.requestSubscribe(config.NOTIFICATION_TEMPLATE_ID)
+        } catch (e) {
+          console.log('Notification subscription skipped')
+        }
+      }
       setTimeout(() => { wx.navigateBack() }, 1500)
     }
   }

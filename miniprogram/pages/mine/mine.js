@@ -10,7 +10,8 @@ const roleMap = {
 Page({
   data: {
     userInfo: {},
-    roleName: ''
+    roleName: '',
+    debugTapCount: 0
   },
 
   async onLoad() {
@@ -48,6 +49,45 @@ Page({
   },
 
   goSettings() {
-    wx.showToast({ title: '设置功能开发中', icon: 'none' })
+    wx.navigateTo({ url: '/pages/settings/settings' })
+  },
+
+  onVersionTap() {
+    const count = this.data.debugTapCount + 1
+    this.setData({ debugTapCount: count })
+    if (count >= 5) {
+      this.setData({ debugTapCount: 0 })
+      wx.showActionSheet({
+        itemList: ['开启测试模式', '关闭测试模式', '查看当前OpenID'],
+        success: async (res) => {
+          const app = getApp()
+          if (res.tapIndex === 0) {
+            app.globalData.testMode = true
+            const members = await api.users.getFamilyMembers()
+            if (members && members.data) {
+              const names = members.data.map(m => m.name)
+              wx.showActionSheet({
+                itemList: names,
+                success: (r) => {
+                  app.globalData.testOpenid = members.data[r.tapIndex].openid || ''
+                  wx.showToast({ title: '已切换到 ' + names[r.tapIndex], icon: 'none' })
+                }
+              })
+            }
+          } else if (res.tapIndex === 1) {
+            app.globalData.testMode = false
+            app.globalData.testOpenid = ''
+            wx.showToast({ title: '已关闭测试模式', icon: 'none' })
+          } else {
+            const info = await api.users.getUserInfo()
+            wx.showModal({
+              title: '当前信息',
+              content: 'OpenID: ' + (info.data ? info.data.openid : 'unknown'),
+              showCancel: false
+            })
+          }
+        }
+      })
+    }
   }
 })

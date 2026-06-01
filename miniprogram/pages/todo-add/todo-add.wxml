@@ -10,6 +10,7 @@
       <picker mode="date" value="{{dueDate}}" bindchange="onDateChange">
         <view class="picker-value">{{dueDate || '选择日期'}}</view>
       </picker>
+      <text class="lunar-preview" wx:if="{{lunarPreview}}">农历 {{lunarPreview}}</text>
     </view>
 
     <view class="form-item">
