@@ -1,0 +1,47 @@
+const api = require('../../utils/api')
+const categoryMap = { daily: '日常', shopping: '购物', family: '家庭', bill: '账单', other: '其他' }
+const repeatMap = { none: '不重复', daily: '每天', weekly: '每周', monthly: '每月', lunar_yearly: '农历每年' }
+
+Page({
+  data: {
+    todo: {}, categoryName: '', assigneeName: '', repeatName: '',
+    colorMap: { red: '#ff4d4f', blue: '#4A90D9', green: '#52c41a', yellow: '#faad14' }
+  },
+  onLoad(options) {
+    this.todoId = options.id
+    this.loadTodo()
+  },
+  async loadTodo() {
+    const res = await api.todos.getToday()
+    if (res && res.data) {
+      const todo = res.data.find(t => t._id === this.todoId)
+      if (todo) {
+        const membersRes = await api.users.getFamilyMembers()
+        const members = membersRes && membersRes.data ? membersRes.data : []
+        const assignee = members.find(m => m._id === todo.assignedTo)
+        this.setData({
+          todo,
+          categoryName: categoryMap[todo.category] || '其他',
+          assigneeName: assignee ? assignee.name : '未指定',
+          repeatName: repeatMap[todo.repeat] || '不重复'
+        })
+      }
+    }
+  },
+  async onComplete() {
+    const res = await api.todos.complete(this.todoId)
+    if (res && res.code === 0) { wx.showToast({ title: '已完成', icon: 'success' }); this.loadTodo() }
+  },
+  onEdit() { wx.navigateTo({ url: `/pages/todo-add/todo-add?id=${this.todoId}&mode=edit` }) },
+  async onDelete() {
+    wx.showModal({
+      title: '确认删除', content: '删除后可在回收站恢复',
+      success: async (res) => {
+        if (res.confirm) {
+          const result = await api.todos.delete(this.todoId)
+          if (result && result.code === 0) { wx.showToast({ title: '已删除', icon: 'success' }); setTimeout(() => { wx.navigateBack() }, 1500) }
+        }
+      }
+    })
+  }
+})

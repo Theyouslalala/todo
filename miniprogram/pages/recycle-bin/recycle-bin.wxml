@@ -1,0 +1,13 @@
+<view class="container">
+  <view class="deleted-item" wx:for="{{deletedTodos}}" wx:key="_id">
+    <view class="item-info">
+      <text class="item-title">{{item.title}}</text>
+      <text class="item-date">删除于 {{item.deletedAtStr}}</text>
+    </view>
+    <view class="item-actions">
+      <text class="restore-btn" bindtap="onRestore" data-id="{{item._id}}">恢复</text>
+      <text class="perm-delete-btn" bindtap="onPermanentDelete" data-id="{{item._id}}">彻底删除</text>
+    </view>
+  </view>
+  <view class="empty-state" wx:if="{{deletedTodos.length === 0}}"><text>回收站为空</text></view>
+</view>

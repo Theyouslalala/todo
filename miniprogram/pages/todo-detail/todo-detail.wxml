@@ -1,0 +1,22 @@
+<view class="container">
+  <view class="detail-card">
+    <view class="detail-header">
+      <view class="color-bar" style="background: {{colorMap[todo.color]}}"></view>
+      <text class="detail-title">{{todo.title}}</text>
+    </view>
+    <view class="detail-row"><text class="row-label">日期</text><text class="row-value">{{todo.dueDate}} {{todo.dueTime}}</text></view>
+    <view class="detail-row" wx:if="{{todo.isLunar}}"><text class="row-label">农历</text><text class="row-value">{{todo.lunarDate}}</text></view>
+    <view class="detail-row"><text class="row-label">分类</text><text class="row-value">{{categoryName}}</text></view>
+    <view class="detail-row"><text class="row-label">负责人</text><text class="row-value">{{assigneeName}}</text></view>
+    <view class="detail-row"><text class="row-label">状态</text><text class="row-value {{todo.status === 'completed' ? 'status-done' : ''}}">{{todo.status === 'completed' ? '已完成' : '待办中'}}</text></view>
+    <view class="detail-row" wx:if="{{todo.repeat !== 'none'}}"><text class="row-label">重复</text><text class="row-value">{{repeatName}}</text></view>
+    <view class="detail-row" wx:if="{{todo.quantity}}"><text class="row-label">数量</text><text class="row-value">{{todo.quantity}}</text></view>
+    <view class="detail-row" wx:if="{{todo.description}}"><text class="row-label">描述</text><text class="row-value desc">{{todo.description}}</text></view>
+    <view class="detail-row"><text class="row-label">通知</text><text class="row-value">{{todo.enableNotification ? '已开启' : '已关闭'}}</text></view>
+  </view>
+  <view class="action-area" wx:if="{{todo.status === 'pending'}}">
+    <button class="btn-primary" bindtap="onComplete">标记完成</button>
+    <button class="btn-edit" bindtap="onEdit">编辑</button>
+    <button class="btn-danger" bindtap="onDelete">删除</button>
+  </view>
+</view>

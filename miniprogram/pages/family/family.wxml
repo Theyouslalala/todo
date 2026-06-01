@@ -1,0 +1,19 @@
+<view class="container">
+  <view class="invite-section">
+    <text class="invite-label">邀请码</text>
+    <text class="invite-code">{{inviteCode}}</text>
+    <button class="btn-copy" bindtap="copyCode">复制</button>
+  </view>
+  <view class="members-section">
+    <text class="section-title">家庭成员</text>
+    <view class="member-item" wx:for="{{members}}" wx:key="_id">
+      <view class="member-avatar">{{item.name[0]}}</view>
+      <text class="member-name">{{item.name}}</text>
+      <text class="member-role">{{item.role === 'child' ? '孩子' : item.role === 'father' ? '爸爸' : '妈妈'}}</text>
+    </view>
+  </view>
+  <view class="join-section">
+    <input class="join-input" placeholder="输入邀请码加入家庭" value="{{joinCode}}" bindinput="onJoinInput" />
+    <button class="btn-primary" bindtap="onJoin">加入</button>
+  </view>
+</view>
