@@ -28,6 +28,10 @@ async function getLogs(openid, event) {
 
   const familyGroupId = user.data[0].familyGroupId
 
+  const countRes = await db.collection('activity_logs')
+    .where({ familyGroupId })
+    .count()
+
   const res = await db.collection('activity_logs')
     .where({ familyGroupId })
     .orderBy('createdAt', 'desc')
@@ -48,5 +52,5 @@ async function getLogs(openid, event) {
     userName: userMap[log.userId] || '未知用户'
   }))
 
-  return { code: 0, data: logs }
+  return { code: 0, data: logs, total: countRes.total, hasMore: skip + 20 < countRes.total }
 }

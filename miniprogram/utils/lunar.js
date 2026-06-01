@@ -45,6 +45,11 @@ const lunar = {
     const [year, month, day] = solarDateStr.split('-').map(Number)
     const lunarInfo = this.solarToLunar(year, month, day)
     return Math.abs(lunarInfo.month) === lunarMonth && lunarInfo.day === lunarDay
+  },
+
+  fromDateStr(dateStr) {
+    const parts = dateStr.split('-').map(Number)
+    return this.solarToLunar(parts[0], parts[1], parts[2])
   }
 }
 

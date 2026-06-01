@@ -2,6 +2,7 @@ const cloud = require('wx-server-sdk')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
 const _ = db.command
+const userCache = new Map()
 
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext()
@@ -46,9 +47,12 @@ exports.main = async (event, context) => {
 }
 
 async function getUserAndFamily(openid) {
+  if (userCache.has(openid)) return userCache.get(openid)
   const user = await db.collection('users').where({ openid }).get()
   if (user.data.length === 0) throw new Error('User not found')
-  return user.data[0]
+  const result = user.data[0]
+  userCache.set(openid, result)
+  return result
 }
 
 async function logActivity(familyGroupId, userId, action, targetTitle, detail) {
@@ -107,6 +111,7 @@ async function createTodo(openid, event) {
 
   const res = await db.collection('reminders').add({ data: todoData })
   todoData._id = res._id
+  console.log('[todos] Created todo:', title, 'by', openid)
 
   logActivity(user.familyGroupId, user._id, 'create', title, `创建了待办: ${title}`)
 
@@ -166,6 +171,7 @@ async function deleteTodo(openid, event) {
     data: { deletedAt: db.serverDate() }
   })
 
+  console.log('[todos] Deleted todo:', todoId, 'by', openid)
   logActivity(user.familyGroupId, user._id, 'delete', todo.data.title, `删除了待办: ${todo.data.title}`)
 
   return { code: 0, msg: 'Deleted (soft)' }
@@ -213,6 +219,7 @@ async function completeTodo(openid, event) {
     }
   })
 
+  console.log('[todos] Completed todo:', todoId, 'by', openid)
   logActivity(user.familyGroupId, user._id, 'complete', todo.data.title, `完成了待办: ${todo.data.title}`)
 
   return { code: 0, msg: 'Completed' }
@@ -231,6 +238,7 @@ async function getTodayTodos(openid) {
     })
     .orderBy('dueTime', 'asc')
     .limit(50)
+    .field({ images: false })
     .get()
 
   return { code: 0, data: res.data }
@@ -270,6 +278,7 @@ async function getTodosByMonth(openid, event) {
     .orderBy('dueDate', 'asc')
     .orderBy('dueTime', 'asc')
     .limit(100)
+    .field({ images: false })
     .get()
 
   return { code: 0, data: res.data }
@@ -324,6 +333,7 @@ async function permanentDeleteTodo(openid, event) {
   }
 
   await db.collection('reminders').doc(todoId).remove()
+  console.log('[todos] Permanently deleted:', todoId, 'by', openid)
   return { code: 0, msg: 'Permanently deleted' }
 }
 
@@ -353,6 +363,7 @@ async function getAllTodos(openid) {
     .orderBy('dueDate', 'asc')
     .orderBy('dueTime', 'asc')
     .limit(100)
+    .field({ images: false })
     .get()
   return { code: 0, data: res.data }
 }

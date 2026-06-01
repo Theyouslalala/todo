@@ -77,7 +77,7 @@ Page({
             const info = await api.users.getUserInfo()
             wx.showModal({
               title: '当前信息',
-              content: 'OpenID: ' + (info.data ? info.data.openid : 'unknown'),
+              content: 'OpenID: ' + (info.data ? info.data.openid.slice(0, 8) + '***' : 'unknown'),
               showCancel: false
             })
           }

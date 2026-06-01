@@ -1,11 +1,11 @@
 const api = require('../../utils/api')
 const lunar = require('../../utils/lunar')
-const { CATEGORY_MAP, REPEAT_MAP } = require('../../utils/constants')
+const { CATEGORY_MAP, REPEAT_MAP, COLOR_MAP } = require('../../utils/constants')
 
 Page({
   data: {
     todo: {}, categoryName: '', assigneeName: '', repeatName: '', lunarDateStr: '',
-    colorMap: { red: '#ff4d4f', blue: '#4A90D9', green: '#52c41a', yellow: '#faad14' }
+    colorMap: COLOR_MAP
   },
   onLoad(options) {
     this.todoId = options.id
@@ -20,8 +20,7 @@ Page({
       const assignee = members.find(m => m._id === todo.assignedTo)
       let lunarDateStr = ''
       if (todo.dueDate) {
-        const [y, m, d] = todo.dueDate.split('-').map(Number)
-        const lunarInfo = lunar.solarToLunar(y, m, d)
+        const lunarInfo = lunar.fromDateStr(todo.dueDate)
         lunarDateStr = lunarInfo.fullName
       }
       this.setData({

@@ -1,5 +1,6 @@
 const api = require('../../utils/api')
 const lunar = require('../../utils/lunar')
+const { COLOR_MAP } = require('../../utils/constants')
 const app = getApp()
 
 Page({
@@ -64,7 +65,7 @@ Page({
 
   updateCalendarDots() {
     const { calendarDays, monthTodos } = this.data
-    const colorMap = { red: '#ff4d4f', blue: '#4A90D9', green: '#52c41a', yellow: '#faad14' }
+    const colorMap = COLOR_MAP
 
     calendarDays.forEach(day => {
       if (day.isEmpty) return

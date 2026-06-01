@@ -37,7 +37,7 @@ const notification = {
         content: '您接收提醒的次数即将用完，是否立即补充？',
         success: (modalRes) => {
           if (modalRes.confirm) {
-            this.requestSubscribe(templateId)
+            this.requestSubscribe(templateId).catch(err => console.warn('Notification subscribe failed:', err))
           }
         }
       })

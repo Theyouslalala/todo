@@ -5,7 +5,10 @@ const image = {
         src: filePath,
         quality,
         success: (res) => resolve(res.tempFilePath),
-        fail: () => resolve(filePath)
+        fail: (err) => {
+          console.warn('Image compress failed, using original:', err)
+          resolve(filePath)
+        }
       })
     })
   },

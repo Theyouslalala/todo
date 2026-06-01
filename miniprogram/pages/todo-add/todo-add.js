@@ -38,8 +38,7 @@ Page({
     } else {
       const today = new Date().toISOString().split('T')[0]
       this.setData({ dueDate: today })
-      const parts = today.split('-').map(Number)
-      const info = lunar.solarToLunar(parts[0], parts[1], parts[2])
+      const info = lunar.fromDateStr(today)
       this.setData({ lunarPreview: info.monthName + '月' + info.dayName })
     }
     this.loadMembers()
@@ -86,8 +85,7 @@ Page({
   onDateChange(e) {
     const date = e.detail.value
     this.setData({ dueDate: date })
-    const parts = date.split('-').map(Number)
-    const info = lunar.solarToLunar(parts[0], parts[1], parts[2])
+    const info = lunar.fromDateStr(date)
     this.setData({ lunarPreview: info.monthName + '月' + info.dayName })
   },
   onTimeChange(e) { this.setData({ dueTime: e.detail.value }) },
@@ -127,8 +125,7 @@ Page({
 
     // Compute lunarDate when isLunar is enabled
     if (this.data.isLunar && this.data.dueDate) {
-      const parts = this.data.dueDate.split('-').map(Number)
-      const lunarInfo = lunar.solarToLunar(parts[0], parts[1], parts[2])
+      const lunarInfo = lunar.fromDateStr(this.data.dueDate)
       todoData.lunarDate = `${lunarInfo.month}-${lunarInfo.day}`
     }
 

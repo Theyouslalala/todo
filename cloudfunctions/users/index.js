@@ -40,6 +40,7 @@ async function login(openid, event) {
   const existing = await db.collection('users').where({ openid }).get()
 
   if (existing.data.length > 0) {
+    console.log('[users] User logged in:', openid)
     return { code: 0, data: existing.data[0] }
   }
 
@@ -74,6 +75,7 @@ async function login(openid, event) {
     data: { members: _.push(userRes._id) }
   })
 
+  console.log('[users] New user registered:', openid)
   return { code: 0, data: userData }
 }
 
@@ -128,6 +130,7 @@ async function createFamily(openid, event) {
     data: { familyGroupId: familyRes._id }
   })
 
+  console.log('[users] Family created:', familyRes._id, 'by', openid)
   return { code: 0, data: { familyId: familyRes._id, inviteCode } }
 }
 
@@ -153,7 +156,7 @@ async function joinFamily(openid, event) {
         data: { members: _.pull(userData._id) }
       })
     } catch (err) {
-      // Old family may have been deleted, ignore
+      console.warn('[users] Failed to remove from old family:', err.message)
     }
   }
 
@@ -165,6 +168,7 @@ async function joinFamily(openid, event) {
     data: { familyGroupId: familyData._id }
   })
 
+  console.log('[users] User joined family:', familyData._id, 'by', openid)
   return { code: 0, data: familyData }
 }
 
