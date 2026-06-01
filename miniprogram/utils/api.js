@@ -57,7 +57,9 @@ const api = {
     joinFamily: (inviteCode) => api.call('users', { action: 'joinFamily', inviteCode }),
     getFamilyMembers: () => api.call('users', { action: 'getFamilyMembers' }),
     getUserInfo: () => api.call('users', { action: 'getUserInfo' }),
-    getFamilyInfo: () => api.call('users', { action: 'getFamilyInfo' })
+    getFamilyInfo: () => api.call('users', { action: 'getFamilyInfo' }),
+    updateMemberRole: (memberId, newRole) => api.call('users', { action: 'updateMemberRole', memberId, newRole }),
+    removeMember: (memberId) => api.call('users', { action: 'removeMember', memberId })
   },
 
   notifications: {

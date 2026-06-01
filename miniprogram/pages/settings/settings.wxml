@@ -7,12 +7,29 @@
     </view>
     <view class="form-item">
       <text class="label">角色</text>
-      <view class="role-options">
-        <view wx:for="{{roles}}" wx:key="value"
-          class="role-tag {{role === item.value ? 'active' : ''}}"
-          bindtap="onRoleSelect" data-value="{{item.value}}">
-          {{item.label}}
+      <text class="value">{{userInfo.role === 'admin' ? '管理员' : '成员'}}</text>
+    </view>
+    <view class="form-item">
+      <button class="btn-save" bindtap="onSaveName">保存昵称</button>
+    </view>
+  </view>
+
+  <view class="section" wx:if="{{isAdmin}}">
+    <view class="section-title">家庭成员管理（管理员）</view>
+    <view class="member-item" wx:for="{{members}}" wx:key="_id">
+      <view class="member-info">
+        <view class="member-avatar">{{item.name[0]}}</view>
+        <view class="member-detail">
+          <text class="member-name">{{item.name}}</text>
+          <text class="member-role {{item.role === 'admin' ? 'role-admin' : 'role-member'}}">{{item.roleName}}</text>
         </view>
+      </view>
+      <view class="member-actions" wx:if="{{!item.isSelf}}">
+        <view class="action-link" bindtap="onRoleTap" data-id="{{item._id}}">改角色</view>
+        <view class="action-link action-danger" bindtap="onRemoveMember" data-id="{{item._id}}">移除</view>
+      </view>
+      <view class="member-actions" wx:else>
+        <text class="self-tag">自己</text>
       </view>
     </view>
   </view>
@@ -21,11 +38,7 @@
     <view class="section-title">其他</view>
     <view class="form-item link" bindtap="onAbout">
       <text class="label">关于</text>
-      <text class="arrow">></text>
+      <text class="arrow">›</text>
     </view>
-  </view>
-
-  <view class="submit-area">
-    <button class="btn-primary" bindtap="onSave">保存</button>
   </view>
 </view>

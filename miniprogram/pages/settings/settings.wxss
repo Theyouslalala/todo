@@ -37,35 +37,88 @@
   text-align: right;
 }
 
-.role-options {
-  display: flex;
-  gap: 16rpx;
-}
-
-.role-tag {
-  padding: 12rpx 24rpx;
-  border-radius: 8rpx;
-  font-size: 26rpx;
-  background: #f5f5f5;
+.value {
+  font-size: 30rpx;
   color: #666;
 }
 
-.role-tag.active {
-  background: #e6f0ff;
-  color: #4A90D9;
-  font-weight: 600;
+.btn-save {
+  flex: 1;
+  background: #4A90D9;
+  color: #fff;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  height: 72rpx;
+  line-height: 72rpx;
 }
 
 .link { cursor: pointer; }
 .arrow { color: #ccc; font-size: 32rpx; }
 
-.submit-area { padding: 40rpx 0; }
+/* Member management */
+.member-item {
+  padding: 20rpx 24rpx;
+  border-bottom: 1rpx solid #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
-.btn-primary {
-  background: #4A90D9;
-  color: #fff;
-  border-radius: 12rpx;
-  font-size: 32rpx;
-  height: 88rpx;
-  line-height: 88rpx;
+.member-item:last-child { border-bottom: none; }
+
+.member-info {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.member-avatar {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: #e6f0ff;
+  color: #4A90D9;
+  font-size: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  margin-right: 20rpx;
+}
+
+.member-detail {
+  display: flex;
+  flex-direction: column;
+}
+
+.member-name {
+  font-size: 30rpx;
+  color: #333;
+}
+
+.member-role {
+  font-size: 24rpx;
+  margin-top: 4rpx;
+}
+
+.role-admin { color: #4A90D9; font-weight: 600; }
+.role-member { color: #999; }
+
+.member-actions {
+  display: flex;
+  gap: 20rpx;
+  align-items: center;
+}
+
+.action-link {
+  font-size: 26rpx;
+  color: #4A90D9;
+  padding: 8rpx 16rpx;
+}
+
+.action-danger { color: #ff4d4f; }
+
+.self-tag {
+  font-size: 24rpx;
+  color: #ccc;
 }

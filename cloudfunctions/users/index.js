@@ -8,6 +8,12 @@ async function findUser(openid) {
   return res.data.length > 0 ? res.data[0] : null
 }
 
+async function getFamilyMembersList(familyGroupId) {
+  const family = await db.collection('family_groups').doc(familyGroupId).get()
+  const members = await db.collection('users').where({ _id: _.in(family.data.members) }).get()
+  return { family: family.data, members: members.data }
+}
+
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext()
   const openid = event._testOpenid || wxContext.OPENID
@@ -31,6 +37,10 @@ exports.main = async (event, context) => {
         return await getUserInfo(openid)
       case 'getFamilyInfo':
         return await getFamilyInfo(openid)
+      case 'updateMemberRole':
+        return await updateMemberRole(openid, event)
+      case 'removeMember':
+        return await removeMember(openid, event)
       default:
         return { code: -1, msg: 'Unknown action' }
     }
@@ -56,6 +66,7 @@ async function login(openid, event) {
       name: (name || '我的') + '的家庭',
       members: [],
       inviteCode,
+      createdBy: openid,
       createdAt: db.serverDate()
     }
   })
@@ -64,7 +75,7 @@ async function login(openid, event) {
     openid,
     name: name || '家庭成员',
     avatar: avatar || '',
-    role: 'child',
+    role: 'admin',
     familyGroupId: familyRes._id,
     settings: { fontSize: 'normal', enableAI: false },
     createdAt: db.serverDate()
@@ -77,7 +88,7 @@ async function login(openid, event) {
     data: { members: _.push(userRes._id) }
   })
 
-  console.log('[users] New user registered:', openid)
+  console.log('[users] New admin registered:', openid)
   return { code: 0, data: userData }
 }
 
@@ -113,10 +124,10 @@ async function createFamily(openid, event) {
 
   const inviteCode = Math.random().toString(36).substring(2, 8).toUpperCase()
   const familyRes = await db.collection('family_groups').add({
-    data: { name: familyName || '我的家庭', members: [user._id], inviteCode, createdAt: db.serverDate() }
+    data: { name: familyName || '我的家庭', members: [user._id], inviteCode, createdBy: openid, createdAt: db.serverDate() }
   })
 
-  await db.collection('users').doc(user._id).update({ data: { familyGroupId: familyRes._id } })
+  await db.collection('users').doc(user._id).update({ data: { familyGroupId: familyRes._id, role: 'admin' } })
   console.log('[users] Family created:', familyRes._id, 'by', openid)
   return { code: 0, data: { familyId: familyRes._id, inviteCode } }
 }
@@ -141,7 +152,7 @@ async function joinFamily(openid, event) {
   }
 
   await db.collection('family_groups').doc(familyData._id).update({ data: { members: _.push(user._id) } })
-  await db.collection('users').doc(user._id).update({ data: { familyGroupId: familyData._id } })
+  await db.collection('users').doc(user._id).update({ data: { familyGroupId: familyData._id, role: 'member' } })
   console.log('[users] User joined family:', familyData._id, 'by', openid)
   return { code: 0, data: familyData }
 }
@@ -150,9 +161,8 @@ async function getFamilyMembers(openid) {
   const user = await findUser(openid)
   if (!user) return { code: -1, msg: 'User not found' }
 
-  const family = await db.collection('family_groups').doc(user.familyGroupId).get()
-  const members = await db.collection('users').where({ _id: _.in(family.data.members) }).get()
-  return { code: 0, data: members.data }
+  const { members } = await getFamilyMembersList(user.familyGroupId)
+  return { code: 0, data: members }
 }
 
 async function getUserInfo(openid) {
@@ -172,4 +182,44 @@ async function getFamilyInfo(openid) {
   } catch (err) {
     return { code: -1, msg: 'Family not found' }
   }
+}
+
+async function updateMemberRole(openid, event) {
+  const { memberId, newRole } = event
+  const user = await findUser(openid)
+  if (!user) return { code: -1, msg: 'User not found' }
+  if (user.role !== 'admin') return { code: -1, msg: 'Permission denied: admin only' }
+
+  const validRoles = ['admin', 'member']
+  if (!validRoles.includes(newRole)) return { code: -1, msg: 'Invalid role' }
+
+  const targetUser = await db.collection('users').doc(memberId).get()
+  if (!targetUser.data || targetUser.data.familyGroupId !== user.familyGroupId) {
+    return { code: -1, msg: 'Member not found in your family' }
+  }
+
+  if (targetUser.data._id === user._id) return { code: -1, msg: 'Cannot change your own role' }
+
+  await db.collection('users').doc(memberId).update({ data: { role: newRole } })
+  console.log('[users] Role updated:', memberId, '->', newRole, 'by', openid)
+  return { code: 0, msg: 'Role updated' }
+}
+
+async function removeMember(openid, event) {
+  const { memberId } = event
+  const user = await findUser(openid)
+  if (!user) return { code: -1, msg: 'User not found' }
+  if (user.role !== 'admin') return { code: -1, msg: 'Permission denied: admin only' }
+
+  if (memberId === user._id) return { code: -1, msg: 'Cannot remove yourself' }
+
+  const targetUser = await db.collection('users').doc(memberId).get()
+  if (!targetUser.data || targetUser.data.familyGroupId !== user.familyGroupId) {
+    return { code: -1, msg: 'Member not found in your family' }
+  }
+
+  await db.collection('family_groups').doc(user.familyGroupId).update({ data: { members: _.pull(memberId) } })
+  await db.collection('users').doc(memberId).update({ data: { familyGroupId: null, role: 'member' } })
+  console.log('[users] Member removed:', memberId, 'by', openid)
+  return { code: 0, msg: 'Member removed' }
 }

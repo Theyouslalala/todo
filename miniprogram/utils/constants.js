@@ -35,9 +35,13 @@ const NOTIFY_OPTIONS = [
 const CATEGORY_MAP = Object.fromEntries(CATEGORIES.map(c => [c.value, c.label]))
 const COLOR_MAP = Object.fromEntries(COLORS.map(c => [c.value, c.hex]))
 const REPEAT_MAP = Object.fromEntries(REPEAT_OPTIONS.map(r => [r.value, r.label]))
-const ROLE_MAP = { child: '孩子', father: '爸爸', mother: '妈妈' }
+const ROLE_MAP = { admin: '管理员', member: '成员' }
+const ROLE_OPTIONS = [
+  { label: '管理员', value: 'admin' },
+  { label: '成员', value: 'member' }
+]
 
 module.exports = {
-  CATEGORY_MAP, REPEAT_MAP, COLOR_MAP, ROLE_MAP,
+  CATEGORY_MAP, REPEAT_MAP, COLOR_MAP, ROLE_MAP, ROLE_OPTIONS,
   CATEGORIES, COLORS, REPEAT_OPTIONS, NOTIFY_OPTIONS
 }
