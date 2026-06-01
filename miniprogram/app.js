@@ -10,7 +10,8 @@ App({
       traceUser: true
     })
 
-    this._loginPromise = this.login()
+    // Fire and forget - don't block app launch
+    this.login()
   },
 
   async login() {
@@ -34,22 +35,26 @@ App({
       }
     } catch (err) {
       console.error('Login failed:', err)
+    } finally {
+      this.globalData.loginDone = true
     }
   },
 
   globalData: {
     userInfo: null,
     needLogin: false,
+    loginDone: false,
     testMode: false,
     testOpenid: ''
   },
 
   async waitForLogin() {
     if (this.globalData.userInfo) return this.globalData.userInfo
-    if (this._loginPromise) {
-      await this._loginPromise
-      return this.globalData.userInfo
+    // Wait for login with 8-second max
+    const start = Date.now()
+    while (!this.globalData.loginDone && Date.now() - start < 8000) {
+      await new Promise(resolve => setTimeout(resolve, 100))
     }
-    return null
+    return this.globalData.userInfo
   }
 })
