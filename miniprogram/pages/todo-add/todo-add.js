@@ -2,6 +2,7 @@ const api = require('../../utils/api')
 const lunar = require('../../utils/lunar')
 const notification = require('../../utils/notification')
 const config = require('../../config')
+const { CATEGORIES, COLORS, REPEAT_OPTIONS, NOTIFY_OPTIONS } = require('../../utils/constants')
 
 Page({
   data: {
@@ -22,33 +23,10 @@ Page({
     lunarPreview: '',
     members: [],
     isEdit: false,
-    categories: [
-      { label: '日常', value: 'daily' },
-      { label: '购物', value: 'shopping' },
-      { label: '家庭', value: 'family' },
-      { label: '账单', value: 'bill' },
-      { label: '其他', value: 'other' }
-    ],
-    colors: [
-      { label: '红', value: 'red', hex: '#ff4d4f' },
-      { label: '蓝', value: 'blue', hex: '#4A90D9' },
-      { label: '绿', value: 'green', hex: '#52c41a' },
-      { label: '黄', value: 'yellow', hex: '#faad14' }
-    ],
-    repeatOptions: [
-      { label: '不重复', value: 'none' },
-      { label: '每天', value: 'daily' },
-      { label: '每周', value: 'weekly' },
-      { label: '每月', value: 'monthly' },
-      { label: '农历每年', value: 'lunar_yearly' }
-    ],
-    notifyOptions: [
-      { label: '准时', value: 0 },
-      { label: '5分钟前', value: 5 },
-      { label: '15分钟前', value: 15 },
-      { label: '30分钟前', value: 30 },
-      { label: '1小时前', value: 60 }
-    ]
+    categories: CATEGORIES,
+    colors: COLORS,
+    repeatOptions: REPEAT_OPTIONS,
+    notifyOptions: NOTIFY_OPTIONS
   },
 
   onLoad(options) {

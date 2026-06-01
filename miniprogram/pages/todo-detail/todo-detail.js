@@ -1,7 +1,6 @@
 const api = require('../../utils/api')
 const lunar = require('../../utils/lunar')
-const categoryMap = { daily: '日常', shopping: '购物', family: '家庭', bill: '账单', other: '其他' }
-const repeatMap = { none: '不重复', daily: '每天', weekly: '每周', monthly: '每月', lunar_yearly: '农历每年' }
+const { CATEGORY_MAP, REPEAT_MAP } = require('../../utils/constants')
 
 Page({
   data: {
@@ -27,9 +26,9 @@ Page({
       }
       this.setData({
         todo,
-        categoryName: categoryMap[todo.category] || '其他',
+        categoryName: CATEGORY_MAP[todo.category] || '其他',
         assigneeName: assignee ? assignee.name : '未指定',
-        repeatName: repeatMap[todo.repeat] || '不重复',
+        repeatName: REPEAT_MAP[todo.repeat] || '不重复',
         lunarDateStr
       })
     }

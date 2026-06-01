@@ -8,25 +8,30 @@ exports.main = async (event, context) => {
   const openid = event._testOpenid || wxContext.OPENID
   const { action } = event
 
-  switch (action) {
-    case 'login':
-      return await login(openid, event)
-    case 'updateProfile':
-      return await updateProfile(openid, event)
-    case 'updateSettings':
-      return await updateSettings(openid, event)
-    case 'createFamily':
-      return await createFamily(openid, event)
-    case 'joinFamily':
-      return await joinFamily(openid, event)
-    case 'getFamilyMembers':
-      return await getFamilyMembers(openid)
-    case 'getUserInfo':
-      return await getUserInfo(openid)
-    case 'getFamilyInfo':
-      return await getFamilyInfo(openid)
-    default:
-      return { code: -1, msg: 'Unknown action' }
+  try {
+    switch (action) {
+      case 'login':
+        return await login(openid, event)
+      case 'updateProfile':
+        return await updateProfile(openid, event)
+      case 'updateSettings':
+        return await updateSettings(openid, event)
+      case 'createFamily':
+        return await createFamily(openid, event)
+      case 'joinFamily':
+        return await joinFamily(openid, event)
+      case 'getFamilyMembers':
+        return await getFamilyMembers(openid)
+      case 'getUserInfo':
+        return await getUserInfo(openid)
+      case 'getFamilyInfo':
+        return await getFamilyInfo(openid)
+      default:
+        return { code: -1, msg: 'Unknown action' }
+    }
+  } catch (err) {
+    console.error(`[users] action=${action} error:`, err)
+    return { code: -1, msg: 'Server error' }
   }
 }
 

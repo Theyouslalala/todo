@@ -8,28 +8,38 @@ exports.main = async (event, context) => {
   const openid = event._testOpenid || wxContext.OPENID
   const { action } = event
 
-  switch (action) {
-    case 'updateSubscription':
-      return await updateSubscription(openid, event)
-    case 'getSubscriptionCount':
-      return await getSubscriptionCount(openid, event)
-    case 'sendNotification':
-      return await sendNotification(event)
-    case 'batchSubscribe':
-      return await batchSubscribe(openid, event)
-    default:
-      return { code: -1, msg: 'Unknown action' }
+  try {
+    switch (action) {
+      case 'updateSubscription':
+        return await updateSubscription(openid, event)
+      case 'getSubscriptionCount':
+        return await getSubscriptionCount(openid, event)
+      case 'sendNotification':
+        return await sendNotification(event)
+      case 'batchSubscribe':
+        return await batchSubscribe(openid, event)
+      default:
+        return { code: -1, msg: 'Unknown action' }
+    }
+  } catch (err) {
+    console.error(`[notifications] action=${action} error:`, err)
+    return { code: -1, msg: 'Server error' }
   }
+}
+
+async function findUser(openid) {
+  const user = await db.collection('users').where({ openid }).get()
+  if (user.data.length === 0) return null
+  return user.data[0]
 }
 
 async function updateSubscription(openid, event) {
   const { templateId, count = 1 } = event
-  const user = await db.collection('users').where({ openid }).get()
-  if (user.data.length === 0) return { code: -1, msg: 'User not found' }
+  const user = await findUser(openid)
+  if (!user) return { code: -1, msg: 'User not found' }
 
-  const userId = user.data[0]._id
   const existing = await db.collection('notification_records')
-    .where({ userId, templateId }).get()
+    .where({ userId: user._id, templateId }).get()
 
   if (existing.data.length > 0) {
     await db.collection('notification_records').doc(existing.data[0]._id).update({
@@ -42,7 +52,7 @@ async function updateSubscription(openid, event) {
   } else {
     await db.collection('notification_records').add({
       data: {
-        userId,
+        userId: user._id,
         templateId,
         remainingCount: count,
         lastSubscribeAt: db.serverDate(),
@@ -56,12 +66,11 @@ async function updateSubscription(openid, event) {
 
 async function getSubscriptionCount(openid, event) {
   const { templateId } = event
-  const user = await db.collection('users').where({ openid }).get()
-  if (user.data.length === 0) return { code: -1, msg: 'User not found' }
+  const user = await findUser(openid)
+  if (!user) return { code: -1, msg: 'User not found' }
 
-  const userId = user.data[0]._id
   const record = await db.collection('notification_records')
-    .where({ userId, templateId }).get()
+    .where({ userId: user._id, templateId }).get()
 
   const count = record.data.length > 0 ? record.data[0].remainingCount : 0
   return { code: 0, data: { count } }
@@ -102,7 +111,8 @@ async function sendNotification(event) {
 
     return { code: 0, msg: 'Notification sent' }
   } catch (err) {
-    return { code: -1, msg: err.message }
+    console.error('[notifications] sendNotification failed:', err)
+    return { code: -1, msg: 'Notification send failed' }
   }
 }
 

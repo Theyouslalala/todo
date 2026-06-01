@@ -8,11 +8,16 @@ exports.main = async (event, context) => {
   const openid = event._testOpenid || wxContext.OPENID
   const { action } = event
 
-  switch (action) {
-    case 'getLogs':
-      return await getLogs(openid, event)
-    default:
-      return { code: -1, msg: 'Unknown action' }
+  try {
+    switch (action) {
+      case 'getLogs':
+        return await getLogs(openid, event)
+      default:
+        return { code: -1, msg: 'Unknown action' }
+    }
+  } catch (err) {
+    console.error(`[activity-logs] action=${action} error:`, err)
+    return { code: -1, msg: 'Server error' }
   }
 }
 

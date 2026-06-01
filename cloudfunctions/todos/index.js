@@ -8,35 +8,40 @@ exports.main = async (event, context) => {
   const openid = event._testOpenid || wxContext.OPENID
   const { action } = event
 
-  switch (action) {
-    case 'create':
-      return await createTodo(openid, event)
-    case 'update':
-      return await updateTodo(openid, event)
-    case 'delete':
-      return await deleteTodo(openid, event)
-    case 'restore':
-      return await restoreTodo(openid, event)
-    case 'complete':
-      return await completeTodo(openid, event)
-    case 'getToday':
-      return await getTodayTodos(openid)
-    case 'getByDate':
-      return await getTodosByDate(openid, event)
-    case 'getByMonth':
-      return await getTodosByMonth(openid, event)
-    case 'search':
-      return await searchTodos(openid, event)
-    case 'getDeleted':
-      return await getDeletedTodos(openid)
-    case 'permanentDelete':
-      return await permanentDeleteTodo(openid, event)
-    case 'getById':
-      return await getTodoById(openid, event)
-    case 'getAll':
-      return await getAllTodos(openid)
-    default:
-      return { code: -1, msg: 'Unknown action' }
+  try {
+    switch (action) {
+      case 'create':
+        return await createTodo(openid, event)
+      case 'update':
+        return await updateTodo(openid, event)
+      case 'delete':
+        return await deleteTodo(openid, event)
+      case 'restore':
+        return await restoreTodo(openid, event)
+      case 'complete':
+        return await completeTodo(openid, event)
+      case 'getToday':
+        return await getTodayTodos(openid)
+      case 'getByDate':
+        return await getTodosByDate(openid, event)
+      case 'getByMonth':
+        return await getTodosByMonth(openid, event)
+      case 'search':
+        return await searchTodos(openid, event)
+      case 'getDeleted':
+        return await getDeletedTodos(openid)
+      case 'permanentDelete':
+        return await permanentDeleteTodo(openid, event)
+      case 'getById':
+        return await getTodoById(openid, event)
+      case 'getAll':
+        return await getAllTodos(openid)
+      default:
+        return { code: -1, msg: 'Unknown action' }
+    }
+  } catch (err) {
+    console.error(`[todos] action=${action} error:`, err)
+    return { code: -1, msg: 'Server error' }
   }
 }
 
@@ -47,16 +52,24 @@ async function getUserAndFamily(openid) {
 }
 
 async function logActivity(familyGroupId, userId, action, targetTitle, detail) {
-  await db.collection('activity_logs').add({
-    data: {
-      familyGroupId,
-      userId,
-      action,
-      targetTitle,
-      detail,
-      createdAt: db.serverDate()
-    }
-  })
+  try {
+    await db.collection('activity_logs').add({
+      data: {
+        familyGroupId,
+        userId,
+        action,
+        targetTitle,
+        detail,
+        createdAt: db.serverDate()
+      }
+    })
+  } catch (err) {
+    console.error('[todos] logActivity failed:', err)
+  }
+}
+
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
 async function createTodo(openid, event) {
@@ -95,10 +108,7 @@ async function createTodo(openid, event) {
   const res = await db.collection('reminders').add({ data: todoData })
   todoData._id = res._id
 
-  await logActivity(
-    user.familyGroupId, user._id, 'create',
-    title, `创建了待办: ${title}`
-  )
+  logActivity(user.familyGroupId, user._id, 'create', title, `创建了待办: ${title}`)
 
   return { code: 0, data: todoData }
 }
@@ -120,7 +130,6 @@ async function updateTodo(openid, event) {
     }
   }
 
-  // 鉴权：验证待办属于当前用户的家庭组
   try {
     const todo = await db.collection('reminders').doc(todoId).get()
     if (!todo.data || todo.data.familyGroupId !== user.familyGroupId) {
@@ -134,10 +143,7 @@ async function updateTodo(openid, event) {
     data: updateFields
   })
 
-  await logActivity(
-    user.familyGroupId, user._id, 'update',
-    updateFields.title || '', `更新了待办`
-  )
+  logActivity(user.familyGroupId, user._id, 'update', updateFields.title || '', '更新了待办')
 
   return { code: 0, msg: 'Updated' }
 }
@@ -146,7 +152,6 @@ async function deleteTodo(openid, event) {
   const user = await getUserAndFamily(openid)
   const { todoId } = event
 
-  // 鉴权：验证待办属于当前用户的家庭组
   let todo
   try {
     todo = await db.collection('reminders').doc(todoId).get()
@@ -161,10 +166,7 @@ async function deleteTodo(openid, event) {
     data: { deletedAt: db.serverDate() }
   })
 
-  await logActivity(
-    user.familyGroupId, user._id, 'delete',
-    todo.data.title, `删除了待办: ${todo.data.title}`
-  )
+  logActivity(user.familyGroupId, user._id, 'delete', todo.data.title, `删除了待办: ${todo.data.title}`)
 
   return { code: 0, msg: 'Deleted (soft)' }
 }
@@ -173,7 +175,6 @@ async function restoreTodo(openid, event) {
   const user = await getUserAndFamily(openid)
   const { todoId } = event
 
-  // 鉴权：验证待办属于当前用户的家庭组
   try {
     const todo = await db.collection('reminders').doc(todoId).get()
     if (!todo.data || todo.data.familyGroupId !== user.familyGroupId) {
@@ -194,7 +195,6 @@ async function completeTodo(openid, event) {
   const user = await getUserAndFamily(openid)
   const { todoId } = event
 
-  // 鉴权：验证待办属于当前用户的家庭组
   let todo
   try {
     todo = await db.collection('reminders').doc(todoId).get()
@@ -213,10 +213,7 @@ async function completeTodo(openid, event) {
     }
   })
 
-  await logActivity(
-    user.familyGroupId, user._id, 'complete',
-    todo.data.title, `完成了待办: ${todo.data.title}`
-  )
+  logActivity(user.familyGroupId, user._id, 'complete', todo.data.title, `完成了待办: ${todo.data.title}`)
 
   return { code: 0, msg: 'Completed' }
 }
@@ -280,18 +277,15 @@ async function getTodosByMonth(openid, event) {
 
 async function searchTodos(openid, event) {
   const user = await getUserAndFamily(openid)
-  let { keyword, skip = 0 } = event
+  const { keyword, skip = 0 } = event
 
-  // 防止 ReDoS：转义用户输入中的正则特殊字符
-  if (typeof keyword === 'string') {
-    keyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-  }
+  const safeKeyword = escapeRegex(keyword)
 
   const res = await db.collection('reminders')
     .where({
       familyGroupId: user.familyGroupId,
       deletedAt: null,
-      title: db.RegExp({ regexp: keyword, options: 'i' })
+      title: db.RegExp({ regexp: safeKeyword, options: 'i' })
     })
     .orderBy('createdAt', 'desc')
     .skip(skip)
@@ -333,21 +327,6 @@ async function permanentDeleteTodo(openid, event) {
   return { code: 0, msg: 'Permanently deleted' }
 }
 
-async function getAllTodos(openid) {
-  const user = await getUserAndFamily(openid)
-  const res = await db.collection('reminders')
-    .where({
-      familyGroupId: user.familyGroupId,
-      status: 'pending',
-      deletedAt: null
-    })
-    .orderBy('dueDate', 'asc')
-    .orderBy('dueTime', 'asc')
-    .limit(100)
-    .get()
-  return { code: 0, data: res.data }
-}
-
 async function getTodoById(openid, event) {
   const user = await getUserAndFamily(openid)
   const { todoId } = event
@@ -361,4 +340,19 @@ async function getTodoById(openid, event) {
   } catch (err) {
     return { code: -1, msg: 'Todo not found' }
   }
+}
+
+async function getAllTodos(openid) {
+  const user = await getUserAndFamily(openid)
+  const res = await db.collection('reminders')
+    .where({
+      familyGroupId: user.familyGroupId,
+      status: 'pending',
+      deletedAt: null
+    })
+    .orderBy('dueDate', 'asc')
+    .orderBy('dueTime', 'asc')
+    .limit(100)
+    .get()
+  return { code: 0, data: res.data }
 }

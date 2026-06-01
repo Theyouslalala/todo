@@ -1,11 +1,6 @@
 const app = getApp()
 const api = require('../../utils/api')
-
-const roleMap = {
-  child: '孩子',
-  father: '爸爸',
-  mother: '妈妈'
-}
+const { ROLE_MAP } = require('../../utils/constants')
 
 Page({
   data: {
@@ -31,7 +26,7 @@ Page({
       app.globalData.userInfo = res.data
       this.setData({
         userInfo: res.data,
-        roleName: roleMap[res.data.role] || '成员'
+        roleName: ROLE_MAP[res.data.role] || '成员'
       })
     }
   },
