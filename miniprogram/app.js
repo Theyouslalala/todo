@@ -10,12 +10,11 @@ App({
       traceUser: true
     })
 
-    this.login()
+    this._loginPromise = this.login()
   },
 
   async login() {
     try {
-      // First try to get existing user info
       let res = await wx.cloud.callFunction({
         name: 'users',
         data: { action: 'getUserInfo' }
@@ -25,7 +24,6 @@ App({
         this.globalData.userInfo = res.result.data
         console.log('User logged in:', res.result.data.name)
       } else {
-        // User not found, auto-register
         res = await wx.cloud.callFunction({
           name: 'users',
           data: { action: 'login', name: '家庭成员' }
@@ -48,24 +46,12 @@ App({
     testOpenid: ''
   },
 
-  // Wait for login to complete before calling API
-  waitForLogin() {
-    return new Promise((resolve) => {
-      if (this.globalData.userInfo) {
-        resolve(this.globalData.userInfo)
-        return
-      }
-      const check = setInterval(() => {
-        if (this.globalData.userInfo) {
-          clearInterval(check)
-          resolve(this.globalData.userInfo)
-        }
-      }, 100)
-      // Timeout after 5 seconds
-      setTimeout(() => {
-        clearInterval(check)
-        resolve(null)
-      }, 5000)
-    })
+  async waitForLogin() {
+    if (this.globalData.userInfo) return this.globalData.userInfo
+    if (this._loginPromise) {
+      await this._loginPromise
+      return this.globalData.userInfo
+    }
+    return null
   }
 })
