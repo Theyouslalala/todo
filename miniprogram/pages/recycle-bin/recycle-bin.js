@@ -19,7 +19,10 @@ Page({
       title: '彻底删除', content: '此操作不可恢复，确定删除？',
       success: async (res) => {
         if (res.confirm) {
-          await api.todos.permanentDelete(e.currentTarget.dataset.id)
+          const result = await api.todos.permanentDelete(e.currentTarget.dataset.id)
+          if (result && result.code === 0) {
+            wx.showToast({ title: '已彻底删除', icon: 'success' })
+          }
           this.loadDeleted()
         }
       }

@@ -15,7 +15,7 @@
     <view class="toggle-item {{viewMode === 'all' ? 'active' : ''}}" bindtap="onViewModeChange" data-mode="all">所有待办</view>
   </view>
 
-  <category-filter current="{{currentCategory}}" bind:categorychange="onCategoryChange" />
+  <category-filter current="{{currentCategory}}" bind:change="onCategoryChange" />
 
   <view class="skeleton-list" wx:if="{{loading}}">
     <view class="skeleton-card" wx:for="{{[1,2,3]}}" wx:key="*this">

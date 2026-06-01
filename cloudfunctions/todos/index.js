@@ -105,9 +105,20 @@ async function createTodo(openid, event) {
 
 async function updateTodo(openid, event) {
   const user = await getUserAndFamily(openid)
-  const { todoId, action, _testOpenid, ...updateFields } = event
+  const { todoId, action, _testOpenid } = event
 
-  updateFields.updatedAt = db.serverDate()
+  const allowedFields = [
+    'title', 'description', 'color', 'priority', 'category',
+    'dueDate', 'dueTime', 'isLunar', 'lunarDate', 'repeat',
+    'assignedTo', 'images', 'quantity', 'enableNotification', 'notifyBefore'
+  ]
+
+  const updateFields = { updatedAt: db.serverDate() }
+  for (const key of allowedFields) {
+    if (event[key] !== undefined) {
+      updateFields[key] = event[key]
+    }
+  }
 
   await db.collection('reminders').doc(todoId).update({
     data: updateFields

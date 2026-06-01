@@ -36,10 +36,8 @@ Component({
     },
     onCardTap(e) {
       if (this.data.expanded) {
-        const target = e.currentTarget.dataset
-        if (!target.action) {
-          this.setData({ expanded: false })
-        }
+        this.setData({ expanded: false })
+        return
       }
       this.triggerEvent('tap', { todo: this.data.todo })
     },

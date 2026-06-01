@@ -5,7 +5,7 @@ const _ = db.command
 
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext()
-  const openid = wxContext.OPENID
+  const openid = event._testOpenid || wxContext.OPENID
   const { action } = event
 
   switch (action) {

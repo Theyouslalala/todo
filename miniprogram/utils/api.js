@@ -41,13 +41,15 @@ const api = {
     createFamily: (data) => api.call('users', { action: 'createFamily', ...data }),
     joinFamily: (inviteCode) => api.call('users', { action: 'joinFamily', inviteCode }),
     getFamilyMembers: () => api.call('users', { action: 'getFamilyMembers' }),
-    getUserInfo: () => api.call('users', { action: 'getUserInfo' })
+    getUserInfo: () => api.call('users', { action: 'getUserInfo' }),
+    getFamilyInfo: () => api.call('users', { action: 'getFamilyInfo' })
   },
 
   notifications: {
     updateSubscription: (data) => api.call('notifications', { action: 'updateSubscription', ...data }),
     getSubscriptionCount: (templateId) => api.call('notifications', { action: 'getSubscriptionCount', templateId }),
-    batchSubscribe: (data) => api.call('notifications', { action: 'batchSubscribe', ...data })
+    batchSubscribe: (data) => api.call('notifications', { action: 'batchSubscribe', ...data }),
+    sendNotification: (data) => api.call('notifications', { action: 'sendNotification', ...data })
   },
 
   activityLogs: {

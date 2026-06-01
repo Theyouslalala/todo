@@ -94,8 +94,11 @@ async function updateSettings(openid, event) {
   const user = await db.collection('users').where({ openid }).get()
   if (user.data.length === 0) return { code: -1, msg: 'User not found' }
 
+  const existingSettings = user.data[0].settings || {}
+  const mergedSettings = { ...existingSettings, ...settings }
+
   await db.collection('users').doc(user.data[0]._id).update({
-    data: { settings }
+    data: { settings: mergedSettings }
   })
 
   return { code: 0, msg: 'Settings updated' }
