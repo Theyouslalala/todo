@@ -1,0 +1,24 @@
+<view class="todo-card priority-{{todo.priority}}" bindtap="onTap">
+  <view class="card-header">
+    <view class="color-dot color-{{todo.color}}"></view>
+    <view class="card-title">{{todo.title}}</view>
+    <view class="card-category">{{categoryName}}</view>
+  </view>
+  <view class="card-body" wx:if="{{todo.description || todo.quantity}}">
+    <text wx:if="{{todo.description}}" class="card-desc">{{todo.description}}</text>
+    <text wx:if="{{todo.quantity}}" class="card-quantity">数量: {{todo.quantity}}</text>
+  </view>
+  <view class="card-footer">
+    <view class="card-time" wx:if="{{todo.dueTime}}">
+      <text class="time-icon">⏰</text>
+      <text>{{todo.dueTime}}</text>
+    </view>
+    <view class="card-assignee">
+      <text class="assignee-avatar">{{assigneeInitial}}</text>
+    </view>
+    <view class="card-actions">
+      <view class="action-btn complete-btn" catchtap="onComplete">✓ 完成</view>
+      <view class="action-btn delete-btn" catchtap="onDelete">删除</view>
+    </view>
+  </view>
+</view>

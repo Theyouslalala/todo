@@ -1,0 +1,21 @@
+.filter-bar {
+  display: flex;
+  padding: 16rpx 24rpx;
+  background: #fff;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+.filter-item {
+  display: inline-block;
+  padding: 12rpx 24rpx;
+  margin-right: 16rpx;
+  border-radius: 24rpx;
+  font-size: 26rpx;
+  color: #666;
+  background: #f5f5f5;
+  flex-shrink: 0;
+}
+.filter-item.active {
+  background: #4A90D9;
+  color: #fff;
+}

@@ -1,0 +1,11 @@
+<view class="filter-bar">
+  <view
+    wx:for="{{categories}}"
+    wx:key="value"
+    class="filter-item {{current === item.value ? 'active' : ''}}"
+    bindtap="onSelect"
+    data-value="{{item.value}}"
+  >
+    {{item.label}}
+  </view>
+</view>

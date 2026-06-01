@@ -1,0 +1,3 @@
+<view class="quick-add-btn" bindtap="onTap">
+  <text class="btn-icon">+</text>
+</view>

@@ -1,0 +1,19 @@
+.quick-add-btn {
+  position: fixed;
+  right: 40rpx;
+  bottom: 180rpx;
+  width: 100rpx;
+  height: 100rpx;
+  background: #4A90D9;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 16rpx rgba(74, 144, 217, 0.4);
+  z-index: 100;
+}
+.btn-icon {
+  color: #fff;
+  font-size: 48rpx;
+  line-height: 1;
+}
