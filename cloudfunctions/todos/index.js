@@ -105,7 +105,7 @@ async function createTodo(openid, event) {
 
 async function updateTodo(openid, event) {
   const user = await getUserAndFamily(openid)
-  const { todoId, action, ...updateFields } = event
+  const { todoId, action, _testOpenid, ...updateFields } = event
 
   updateFields.updatedAt = db.serverDate()
 

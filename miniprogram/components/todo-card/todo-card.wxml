@@ -17,7 +17,7 @@
         <text class="card-time" wx:if="{{todo.dueTime}}">{{todo.dueTime}}</text>
       </view>
       <view class="card-assignee" wx:if="{{todo.assignedTo}}">
-        <view class="assignee-avatar">{{todo._assigneeName || '?'}}</view>
+        <view class="assignee-avatar">{{_assigneeName || '?'}}</view>
       </view>
     </view>
     <view class="card-actions" wx:if="{{expanded}}">
