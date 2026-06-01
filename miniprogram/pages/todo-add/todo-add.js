@@ -147,6 +147,13 @@ Page({
       notifyBefore: this.data.notifyBefore
     }
 
+    // Compute lunarDate when isLunar is enabled
+    if (this.data.isLunar && this.data.dueDate) {
+      const parts = this.data.dueDate.split('-').map(Number)
+      const lunarInfo = lunar.solarToLunar(parts[0], parts[1], parts[2])
+      todoData.lunarDate = `${lunarInfo.month}-${lunarInfo.day}`
+    }
+
     let res
     if (this.data.isEdit) {
       res = await api.todos.update({ todoId: this.todoId, ...todoData })
