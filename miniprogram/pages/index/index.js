@@ -1,5 +1,6 @@
 const api = require('../../utils/api')
 const cache = require('../../utils/cache')
+const app = getApp()
 
 Page({
   data: {
@@ -9,12 +10,15 @@ Page({
     loading: true
   },
 
-  onLoad() {
+  async onLoad() {
+    await app.waitForLogin()
     this.loadData()
   },
 
   onShow() {
-    this.loadTodos()
+    if (app.globalData.userInfo) {
+      this.loadTodos()
+    }
   },
 
   onPullDownRefresh() {

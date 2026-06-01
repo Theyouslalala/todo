@@ -1,5 +1,6 @@
 const api = require('../../utils/api')
 const lunar = require('../../utils/lunar')
+const app = getApp()
 
 Page({
   data: {
@@ -13,14 +14,17 @@ Page({
     monthTodos: []
   },
 
-  onLoad() {
+  async onLoad() {
+    await app.waitForLogin()
     const now = new Date()
     this.setData({ year: now.getFullYear(), month: now.getMonth() + 1 })
     this.loadMonth()
   },
 
   onShow() {
-    this.loadMonthTodos()
+    if (app.globalData.userInfo) {
+      this.loadMonthTodos()
+    }
   },
 
   async loadMonth() {

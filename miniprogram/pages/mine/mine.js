@@ -13,12 +13,15 @@ Page({
     roleName: ''
   },
 
-  onLoad() {
+  async onLoad() {
+    await app.waitForLogin()
     this.loadUserInfo()
   },
 
   onShow() {
-    this.loadUserInfo()
+    if (app.globalData.userInfo) {
+      this.loadUserInfo()
+    }
   },
 
   async loadUserInfo() {
