@@ -6,7 +6,7 @@ const api = {
         data._testOpenid = app.globalData.testOpenid
       }
       const res = await wx.cloud.callFunction({ name, data })
-      if (res.result.code === -1) {
+      if (res.result && res.result.code === -1) {
         wx.showToast({ title: res.result.msg || '操作失败', icon: 'none' })
         return null
       }

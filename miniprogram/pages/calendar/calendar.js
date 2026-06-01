@@ -24,7 +24,10 @@ Page({
   },
 
   onShow() {
-    if (this._dataLoaded && app.globalData.userInfo) {
+    // Skip if already loaded in onLoad (first show)
+    if (this._dataLoaded && !this._initialLoadDone && app.globalData.userInfo) {
+      this._initialLoadDone = true
+    } else if (this._dataLoaded && app.globalData.userInfo) {
       this.loadMonthTodos()
     }
   },

@@ -189,9 +189,17 @@ async function completeTodo(openid, event, cache) {
   return { code: 0, msg: 'Completed' }
 }
 
+function getLocalDate() {
+  const now = new Date()
+  const y = now.getFullYear()
+  const m = String(now.getMonth() + 1).padStart(2, '0')
+  const d = String(now.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
+}
+
 async function getTodayTodos(openid, cache) {
   const user = await getUserAndFamily(openid, cache)
-  const today = new Date().toISOString().split('T')[0]
+  const today = getLocalDate()
 
   const res = await db.collection('reminders')
     .where({ familyGroupId: user.familyGroupId, status: 'pending', deletedAt: null, dueDate: today })
@@ -214,6 +222,7 @@ async function getTodosByDate(openid, event, cache) {
 async function getTodosByMonth(openid, event, cache) {
   const user = await getUserAndFamily(openid, cache)
   const { year, month } = event
+  if (!year || !month) return { code: -1, msg: 'Missing year or month' }
 
   const startDate = `${year}-${String(month).padStart(2, '0')}-01`
   const lastDay = new Date(year, month, 0).getDate()
@@ -229,6 +238,7 @@ async function getTodosByMonth(openid, event, cache) {
 async function searchTodos(openid, event, cache) {
   const user = await getUserAndFamily(openid, cache)
   const { keyword, skip = 0 } = event
+  if (!keyword || typeof keyword !== 'string') return { code: -1, msg: 'Missing keyword' }
   const safeKeyword = escapeRegex(keyword)
 
   const res = await db.collection('reminders')

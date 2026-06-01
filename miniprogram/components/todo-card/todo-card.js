@@ -23,7 +23,16 @@ Component({
       if (assignedTo && this.data.members) {
         const member = this.data.members.find(m => m._id === assignedTo)
         if (member) {
-          this.setData({ '_assigneeName': member.name[0] })
+          this.setData({ '_assigneeName': member.name[0] || '?' })
+        }
+      }
+    },
+    'members': function(members) {
+      const assignedTo = this.data.todo && this.data.todo.assignedTo
+      if (assignedTo && members) {
+        const member = members.find(m => m._id === assignedTo)
+        if (member) {
+          this.setData({ '_assigneeName': member.name[0] || '?' })
         }
       }
     }

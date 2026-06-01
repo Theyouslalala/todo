@@ -12,7 +12,7 @@ Page({
       const membersRes = await api.users.getFamilyMembers()
       if (membersRes && membersRes.data) this.setData({ members: membersRes.data })
 
-      const res = await api.call('users', { action: 'getFamilyInfo' })
+      const res = await api.users.getFamilyInfo()
       if (res && res.data) this.setData({ inviteCode: res.data.inviteCode })
     }
   },

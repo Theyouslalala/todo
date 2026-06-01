@@ -124,6 +124,15 @@ async function createFamily(openid, event) {
   const user = await findUser(openid)
   if (!user) return { code: -1, msg: 'User not found' }
 
+  // Remove from old family if exists
+  if (user.familyGroupId) {
+    try {
+      await db.collection('family_groups').doc(user.familyGroupId).update({ data: { members: _.pull(user._id) } })
+    } catch (err) {
+      console.warn('[users] Failed to remove from old family during createFamily:', err.message)
+    }
+  }
+
   const inviteCode = Math.random().toString(36).substring(2, 8).toUpperCase()
   const familyRes = await db.collection('family_groups').add({
     data: { name: familyName || '我的家庭', members: [user._id], inviteCode, createdBy: openid, createdAt: db.serverDate() }

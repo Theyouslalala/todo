@@ -8,9 +8,7 @@ Page({
     name: '',
     isAdmin: false,
     members: [],
-    roleOptions: ROLE_OPTIONS,
-    showRolePicker: false,
-    editingMember: null
+    roleOptions: ROLE_OPTIONS
   },
 
   async onLoad() {
