@@ -31,6 +31,8 @@ exports.main = async (event, context) => {
       return await getDeletedTodos(openid)
     case 'permanentDelete':
       return await permanentDeleteTodo(openid, event)
+    case 'getById':
+      return await getTodoById(openid, event)
     default:
       return { code: -1, msg: 'Unknown action' }
   }
@@ -101,7 +103,7 @@ async function createTodo(openid, event) {
 
 async function updateTodo(openid, event) {
   const user = await getUserAndFamily(openid)
-  const { todoId, ...updateFields } = event
+  const { todoId, action, ...updateFields } = event
 
   updateFields.updatedAt = db.serverDate()
 
@@ -208,7 +210,8 @@ async function getTodosByMonth(openid, event) {
   const { year, month } = event
 
   const startDate = `${year}-${String(month).padStart(2, '0')}-01`
-  const endDate = `${year}-${String(month).padStart(2, '0')}-31`
+  const lastDay = new Date(year, month, 0).getDate()
+  const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`
 
   const res = await db.collection('reminders')
     .where({
@@ -261,6 +264,30 @@ async function permanentDeleteTodo(openid, event) {
   const user = await getUserAndFamily(openid)
   const { todoId } = event
 
+  try {
+    const todo = await db.collection('reminders').doc(todoId).get()
+    if (!todo.data || todo.data.familyGroupId !== user.familyGroupId) {
+      return { code: -1, msg: 'Todo not found' }
+    }
+  } catch (err) {
+    return { code: -1, msg: 'Todo not found' }
+  }
+
   await db.collection('reminders').doc(todoId).remove()
   return { code: 0, msg: 'Permanently deleted' }
+}
+
+async function getTodoById(openid, event) {
+  const user = await getUserAndFamily(openid)
+  const { todoId } = event
+
+  try {
+    const res = await db.collection('reminders').doc(todoId).get()
+    if (res.data && res.data.familyGroupId === user.familyGroupId) {
+      return { code: 0, data: res.data }
+    }
+    return { code: -1, msg: 'Todo not found' }
+  } catch (err) {
+    return { code: -1, msg: 'Todo not found' }
+  }
 }

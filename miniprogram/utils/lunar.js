@@ -44,7 +44,7 @@ const lunar = {
   matchLunarDate(solarDateStr, lunarMonth, lunarDay) {
     const [year, month, day] = solarDateStr.split('-').map(Number)
     const lunarInfo = this.solarToLunar(year, month, day)
-    return lunarInfo.month === lunarMonth && lunarInfo.day === lunarDay
+    return Math.abs(lunarInfo.month) === lunarMonth && lunarInfo.day === lunarDay
   }
 }
 

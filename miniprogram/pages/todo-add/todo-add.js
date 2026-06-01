@@ -17,6 +17,7 @@ Page({
     notifyBefore: 15,
     showMore: false,
     members: [],
+    isEdit: false,
     categories: [
       { label: '日常', value: 'daily' },
       { label: '购物', value: 'shopping' },
@@ -46,10 +47,40 @@ Page({
     ]
   },
 
-  onLoad() {
-    const today = new Date().toISOString().split('T')[0]
-    this.setData({ dueDate: today })
+  onLoad(options) {
+    if (options.id && options.mode === 'edit') {
+      this.todoId = options.id
+      this.setData({ isEdit: true })
+      wx.setNavigationBarTitle({ title: '编辑待办' })
+      this.loadTodo()
+    } else {
+      const today = new Date().toISOString().split('T')[0]
+      this.setData({ dueDate: today })
+    }
     this.loadMembers()
+  },
+
+  async loadTodo() {
+    const res = await api.todos.getById(this.todoId)
+    if (res && res.data) {
+      const todo = res.data
+      this.setData({
+        title: todo.title || '',
+        description: todo.description || '',
+        dueDate: todo.dueDate || '',
+        dueTime: todo.dueTime || '',
+        category: todo.category || 'daily',
+        color: todo.color || 'blue',
+        priority: todo.priority || 'medium',
+        assignedTo: todo.assignedTo || '',
+        repeat: todo.repeat || 'none',
+        isLunar: todo.isLunar || false,
+        quantity: todo.quantity || '',
+        enableNotification: todo.enableNotification !== false,
+        notifyBefore: todo.notifyBefore || 15,
+        showMore: true
+      })
+    }
   },
 
   async loadMembers() {
@@ -59,7 +90,7 @@ Page({
       const currentUser = app.globalData.userInfo
       this.setData({
         members: res.data,
-        assignedTo: currentUser ? currentUser._id : (res.data[0] ? res.data[0]._id : '')
+        assignedTo: this.data.assignedTo || (currentUser ? currentUser._id : (res.data[0] ? res.data[0]._id : ''))
       })
     }
   },
@@ -73,7 +104,7 @@ Page({
   onColorSelect(e) { this.setData({ color: e.currentTarget.dataset.value }) },
   onAssigneeSelect(e) { this.setData({ assignedTo: e.currentTarget.dataset.id }) },
   onRepeatSelect(e) { this.setData({ repeat: e.currentTarget.dataset.value }) },
-  onNotifySelect(e) { this.setData({ notifyBefore: e.currentTarget.dataset.value }) },
+  onNotifySelect(e) { this.setData({ notifyBefore: Number(e.currentTarget.dataset.value) }) },
   onNotificationChange(e) { this.setData({ enableNotification: e.detail.value }) },
   onLunarChange(e) { this.setData({ isLunar: e.detail.value }) },
   toggleMore() { this.setData({ showMore: !this.data.showMore }) },
@@ -103,12 +134,17 @@ Page({
       notifyBefore: this.data.notifyBefore
     }
 
-    const res = await api.todos.create(todoData)
+    let res
+    if (this.data.isEdit) {
+      res = await api.todos.update({ todoId: this.todoId, ...todoData })
+    } else {
+      res = await api.todos.create(todoData)
+    }
 
     wx.hideLoading()
 
     if (res && res.code === 0) {
-      wx.showToast({ title: '添加成功', icon: 'success' })
+      wx.showToast({ title: this.data.isEdit ? '更新成功' : '添加成功', icon: 'success' })
       setTimeout(() => { wx.navigateBack() }, 1500)
     }
   }

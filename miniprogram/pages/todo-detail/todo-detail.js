@@ -1,10 +1,11 @@
 const api = require('../../utils/api')
+const lunar = require('../../utils/lunar')
 const categoryMap = { daily: '日常', shopping: '购物', family: '家庭', bill: '账单', other: '其他' }
 const repeatMap = { none: '不重复', daily: '每天', weekly: '每周', monthly: '每月', lunar_yearly: '农历每年' }
 
 Page({
   data: {
-    todo: {}, categoryName: '', assigneeName: '', repeatName: '',
+    todo: {}, categoryName: '', assigneeName: '', repeatName: '', lunarDateStr: '',
     colorMap: { red: '#ff4d4f', blue: '#4A90D9', green: '#52c41a', yellow: '#faad14' }
   },
   onLoad(options) {
@@ -12,20 +13,25 @@ Page({
     this.loadTodo()
   },
   async loadTodo() {
-    const res = await api.todos.getToday()
+    const res = await api.todos.getById(this.todoId)
     if (res && res.data) {
-      const todo = res.data.find(t => t._id === this.todoId)
-      if (todo) {
-        const membersRes = await api.users.getFamilyMembers()
-        const members = membersRes && membersRes.data ? membersRes.data : []
-        const assignee = members.find(m => m._id === todo.assignedTo)
-        this.setData({
-          todo,
-          categoryName: categoryMap[todo.category] || '其他',
-          assigneeName: assignee ? assignee.name : '未指定',
-          repeatName: repeatMap[todo.repeat] || '不重复'
-        })
+      const todo = res.data
+      const membersRes = await api.users.getFamilyMembers()
+      const members = membersRes && membersRes.data ? membersRes.data : []
+      const assignee = members.find(m => m._id === todo.assignedTo)
+      let lunarDateStr = ''
+      if (todo.isLunar && todo.dueDate) {
+        const [y, m, d] = todo.dueDate.split('-').map(Number)
+        const lunarInfo = lunar.solarToLunar(y, m, d)
+        lunarDateStr = lunarInfo.fullName
       }
+      this.setData({
+        todo,
+        categoryName: categoryMap[todo.category] || '其他',
+        assigneeName: assignee ? assignee.name : '未指定',
+        repeatName: repeatMap[todo.repeat] || '不重复',
+        lunarDateStr
+      })
     }
   },
   async onComplete() {

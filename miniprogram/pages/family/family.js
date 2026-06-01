@@ -3,8 +3,17 @@ Page({
   data: { members: [], inviteCode: '', joinCode: '' },
   onLoad() { this.loadData() },
   async loadData() {
-    const membersRes = await api.users.getFamilyMembers()
-    if (membersRes && membersRes.data) this.setData({ members: membersRes.data })
+    const userRes = await api.users.getUserInfo()
+    if (!userRes || !userRes.data) return
+
+    const user = userRes.data
+    if (user.familyGroupId) {
+      const membersRes = await api.users.getFamilyMembers()
+      if (membersRes && membersRes.data) this.setData({ members: membersRes.data })
+
+      const res = await api.call('users', { action: 'getFamilyInfo' })
+      if (res && res.data) this.setData({ inviteCode: res.data.inviteCode })
+    }
   },
   copyCode() { wx.setClipboardData({ data: this.data.inviteCode }) },
   onJoinInput(e) { this.setData({ joinCode: e.detail.value }) },

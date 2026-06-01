@@ -45,6 +45,6 @@ Page({
   },
 
   goSettings() {
-    wx.navigateTo({ url: '/pages/settings/settings' })
+    wx.showToast({ title: '设置功能开发中', icon: 'none' })
   }
 })

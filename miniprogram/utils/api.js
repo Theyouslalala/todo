@@ -25,7 +25,8 @@ const api = {
     getByMonth: (year, month) => api.call('todos', { action: 'getByMonth', year, month }),
     search: (keyword, skip) => api.call('todos', { action: 'search', keyword, skip }),
     getDeleted: () => api.call('todos', { action: 'getDeleted' }),
-    permanentDelete: (todoId) => api.call('todos', { action: 'permanentDelete', todoId })
+    permanentDelete: (todoId) => api.call('todos', { action: 'permanentDelete', todoId }),
+    getById: (todoId) => api.call('todos', { action: 'getById', todoId })
   },
 
   users: {

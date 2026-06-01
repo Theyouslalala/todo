@@ -1,0 +1,8 @@
+{
+  "name": "family-reminder",
+  "version": "1.0.0",
+  "description": "家庭提醒小程序",
+  "dependencies": {
+    "lunar-javascript": "^1.6.12"
+  }
+}

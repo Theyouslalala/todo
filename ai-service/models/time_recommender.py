@@ -17,6 +17,9 @@ class TimeRecommender:
         if user_id in self.user_patterns:
             pattern = self.user_patterns[user_id].get(category)
             if pattern:
+                if isinstance(pattern, list):
+                    from collections import Counter
+                    return Counter(pattern).most_common(1)[0][0]
                 return pattern
         return defaults.get(category, "10:00")
 
@@ -25,9 +28,10 @@ class TimeRecommender:
             self.user_patterns[user_id] = {}
         if category not in self.user_patterns[user_id]:
             self.user_patterns[user_id][category] = []
-        self.user_patterns[user_id][category].append(time)
         times = self.user_patterns[user_id][category]
-        if len(times) >= 3:
-            from collections import Counter
-            most_common = Counter(times).most_common(1)[0][0]
-            self.user_patterns[user_id][category] = most_common
+        if not isinstance(times, list):
+            times = [times]
+            self.user_patterns[user_id][category] = times
+        times.append(time)
+        if len(times) > 20:
+            self.user_patterns[user_id][category] = times[-20:]

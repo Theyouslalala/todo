@@ -23,6 +23,8 @@ exports.main = async (event, context) => {
       return await getFamilyMembers(openid)
     case 'getUserInfo':
       return await getUserInfo(openid)
+    case 'getFamilyInfo':
+      return await getFamilyInfo(openid)
     default:
       return { code: -1, msg: 'Unknown action' }
   }
@@ -76,9 +78,9 @@ async function updateProfile(openid, event) {
   if (user.data.length === 0) return { code: -1, msg: 'User not found' }
 
   const updateData = {}
-  if (name) updateData.name = name
-  if (avatar) updateData.avatar = avatar
-  if (role) updateData.role = role
+  if (name !== undefined) updateData.name = name
+  if (avatar !== undefined) updateData.avatar = avatar
+  if (role !== undefined) updateData.role = role
 
   await db.collection('users').doc(user.data[0]._id).update({
     data: updateData
@@ -126,20 +128,32 @@ async function joinFamily(openid, event) {
   const user = await db.collection('users').where({ openid }).get()
   if (user.data.length === 0) return { code: -1, msg: 'User not found' }
 
+  const userData = user.data[0]
   const family = await db.collection('family_groups')
     .where({ inviteCode }).get()
   if (family.data.length === 0) return { code: -1, msg: 'Invalid invite code' }
 
   const familyData = family.data[0]
-  if (familyData.members.includes(user.data[0]._id)) {
+  if (familyData.members.includes(userData._id)) {
     return { code: -1, msg: 'Already in this family' }
   }
 
+  // Remove from old family's members array
+  if (userData.familyGroupId) {
+    try {
+      await db.collection('family_groups').doc(userData.familyGroupId).update({
+        data: { members: _.pull(userData._id) }
+      })
+    } catch (err) {
+      // Old family may have been deleted, ignore
+    }
+  }
+
   await db.collection('family_groups').doc(familyData._id).update({
-    data: { members: _.push(user.data[0]._id) }
+    data: { members: _.push(userData._id) }
   })
 
-  await db.collection('users').doc(user.data[0]._id).update({
+  await db.collection('users').doc(userData._id).update({
     data: { familyGroupId: familyData._id }
   })
 
@@ -165,4 +179,19 @@ async function getUserInfo(openid) {
   const user = await db.collection('users').where({ openid }).get()
   if (user.data.length === 0) return { code: -1, msg: 'User not found' }
   return { code: 0, data: user.data[0] }
+}
+
+async function getFamilyInfo(openid) {
+  const user = await db.collection('users').where({ openid }).get()
+  if (user.data.length === 0) return { code: -1, msg: 'User not found' }
+
+  const familyId = user.data[0].familyGroupId
+  if (!familyId) return { code: -1, msg: 'No family' }
+
+  try {
+    const family = await db.collection('family_groups').doc(familyId).get()
+    return { code: 0, data: family.data }
+  } catch (err) {
+    return { code: -1, msg: 'Family not found' }
+  }
 }

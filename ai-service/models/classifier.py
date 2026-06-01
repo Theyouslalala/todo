@@ -8,7 +8,7 @@ class SimpleClassifier(nn.Module):
         self.embedding = nn.EmbeddingBag(vocab_size, embed_dim, sparse=False)
         self.fc = nn.Linear(embed_dim, num_classes)
 
-    def forward(self, text: str) -> torch.Tensor:
+    def forward(self, text: torch.Tensor) -> torch.Tensor:
         embedded = self.embedding(text)
         return self.fc(embedded)
 

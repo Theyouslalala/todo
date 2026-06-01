@@ -70,7 +70,12 @@ async function getSubscriptionCount(openid, event) {
 async function sendNotification(event) {
   const { userId, templateId, data, page } = event
 
-  const user = await db.collection('users').doc(userId).get()
+  let user
+  try {
+    user = await db.collection('users').doc(userId).get()
+  } catch (err) {
+    return { code: -1, msg: 'User not found' }
+  }
   if (!user.data) return { code: -1, msg: 'User not found' }
 
   const record = await db.collection('notification_records')
