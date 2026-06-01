@@ -35,6 +35,8 @@ exports.main = async (event, context) => {
         return await permanentDeleteTodo(openid, event)
       case 'getById':
         return await getTodoById(openid, event)
+      case 'batchDelete':
+        return await batchDeleteTodos(openid, event)
       case 'getAll':
         return await getAllTodos(openid)
       default:
@@ -350,6 +352,38 @@ async function getTodoById(openid, event) {
   } catch (err) {
     return { code: -1, msg: 'Todo not found' }
   }
+}
+
+async function batchDeleteTodos(openid, event) {
+  const user = await getUserAndFamily(openid)
+  const { todoIds } = event
+  if (!Array.isArray(todoIds) || todoIds.length === 0) {
+    return { code: -1, msg: 'No todos specified' }
+  }
+  if (todoIds.length > 50) {
+    return { code: -1, msg: 'Too many todos' }
+  }
+
+  const now = db.serverDate()
+  const promises = todoIds.map(async (todoId) => {
+    try {
+      const todo = await db.collection('reminders').doc(todoId).get()
+      if (todo.data && todo.data.familyGroupId === user.familyGroupId) {
+        await db.collection('reminders').doc(todoId).update({
+          data: { deletedAt: now }
+        })
+        return { id: todoId, success: true }
+      }
+      return { id: todoId, success: false, reason: 'not found' }
+    } catch (err) {
+      return { id: todoId, success: false, reason: err.message }
+    }
+  })
+
+  const results = await Promise.all(promises)
+  const succeeded = results.filter(r => r.success).length
+  console.log('[todos] Batch delete:', succeeded, '/', todoIds.length, 'by', openid)
+  return { code: 0, data: { total: todoIds.length, succeeded, results } }
 }
 
 async function getAllTodos(openid) {

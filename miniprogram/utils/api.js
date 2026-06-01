@@ -1,5 +1,18 @@
+const pendingRequests = new Map()
+
 const api = {
   async call(name, data = {}) {
+    const key = JSON.stringify({ name, data })
+    if (pendingRequests.has(key)) {
+      return pendingRequests.get(key)
+    }
+    const promise = this._execute(name, data)
+    pendingRequests.set(key, promise)
+    promise.finally(() => pendingRequests.delete(key))
+    return promise
+  },
+
+  async _execute(name, data = {}) {
     try {
       const app = getApp()
       if (app && app.globalData.testMode && app.globalData.testOpenid) {
@@ -31,7 +44,8 @@ const api = {
     getDeleted: () => api.call('todos', { action: 'getDeleted' }),
     permanentDelete: (todoId) => api.call('todos', { action: 'permanentDelete', todoId }),
     getById: (todoId) => api.call('todos', { action: 'getById', todoId }),
-    getAll: () => api.call('todos', { action: 'getAll' })
+    getAll: () => api.call('todos', { action: 'getAll' }),
+    batchDelete: (todoIds) => api.call('todos', { action: 'batchDelete', todoIds })
   },
 
   users: {

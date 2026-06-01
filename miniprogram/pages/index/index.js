@@ -61,7 +61,7 @@ Page({
         res.data = res.data.filter(t => t.category === category)
       }
       this.setData({ todos: res.data, loading: false })
-      cache.set('today_todos', res.data)
+      await cache.set('today_todos', res.data)
     } else {
       this.setData({ loading: false })
     }

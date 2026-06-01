@@ -1,6 +1,8 @@
 const { Lunar, Solar } = require('lunar-javascript')
 
 const lunar = {
+  _monthCache: new Map(),
+
   solarToLunar(year, month, day) {
     const solar = Solar.fromYmd(year, month, day)
     const lunarDate = solar.getLunar()
@@ -27,16 +29,25 @@ const lunar = {
   },
 
   getLunarMonthDays(year, month) {
+    const key = `${year}-${month}`
+    if (this._monthCache.has(key)) return this._monthCache.get(key)
+
     const days = []
     const daysInMonth = new Date(year, month, 0).getDate()
     for (let d = 1; d <= daysInMonth; d++) {
       const lunarInfo = this.solarToLunar(year, month, d)
       days.push({
         day: d,
-        lunarDay: lunarInfo.dayName,
+        lunarDay: lunarInfo.day === 1 ? lunarInfo.monthName + '月' : lunarInfo.dayName,
         lunarMonth: lunarInfo.monthName,
         isLunarFirst: lunarInfo.day === 1
       })
+    }
+    this._monthCache.set(key, days)
+    // Keep cache size reasonable
+    if (this._monthCache.size > 24) {
+      const firstKey = this._monthCache.keys().next().value
+      this._monthCache.delete(firstKey)
     }
     return days
   },

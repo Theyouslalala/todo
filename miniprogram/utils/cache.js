@@ -2,49 +2,81 @@ const CACHE_PREFIX = 'family_todo_'
 const CACHE_EXPIRY = 24 * 60 * 60 * 1000
 
 const cache = {
-  set(key, data) {
+  async set(key, data) {
     const cacheData = { data, timestamp: Date.now(), expiry: CACHE_EXPIRY }
-    try {
-      wx.setStorageSync(CACHE_PREFIX + key, cacheData)
-    } catch (e) {
-      console.error('Cache set error:', e)
-    }
-  },
-
-  get(key) {
-    try {
-      const cacheData = wx.getStorageSync(CACHE_PREFIX + key)
-      if (!cacheData) return null
-      if (Date.now() - cacheData.timestamp > cacheData.expiry) {
-        this.remove(key)
-        return null
-      }
-      return cacheData.data
-    } catch (e) {
-      console.error('Cache get error:', e)
-      return null
-    }
-  },
-
-  remove(key) {
-    try {
-      wx.removeStorageSync(CACHE_PREFIX + key)
-    } catch (e) {
-      console.error('Cache remove error:', e)
-    }
-  },
-
-  clear() {
-    try {
-      const res = wx.getStorageInfoSync()
-      res.keys.forEach(key => {
-        if (key.startsWith(CACHE_PREFIX)) {
-          wx.removeStorageSync(key)
+    return new Promise((resolve, reject) => {
+      wx.setStorage({
+        key: CACHE_PREFIX + key,
+        data: cacheData,
+        success: () => resolve(),
+        fail: (e) => {
+          console.error('Cache set error:', e)
+          reject(e)
         }
       })
-    } catch (e) {
-      console.error('Cache clear error:', e)
-    }
+    })
+  },
+
+  async get(key) {
+    return new Promise((resolve) => {
+      wx.getStorage({
+        key: CACHE_PREFIX + key,
+        success: (res) => {
+          const cacheData = res.data
+          if (!cacheData) {
+            resolve(null)
+            return
+          }
+          if (Date.now() - cacheData.timestamp > cacheData.expiry) {
+            this.remove(key)
+            resolve(null)
+            return
+          }
+          resolve(cacheData.data)
+        },
+        fail: (e) => {
+          console.error('Cache get error:', e)
+          resolve(null)
+        }
+      })
+    })
+  },
+
+  async remove(key) {
+    return new Promise((resolve) => {
+      wx.removeStorage({
+        key: CACHE_PREFIX + key,
+        success: () => resolve(),
+        fail: (e) => {
+          console.error('Cache remove error:', e)
+          resolve()
+        }
+      })
+    })
+  },
+
+  async clear() {
+    return new Promise((resolve) => {
+      wx.getStorageInfo({
+        success: (res) => {
+          const keysToRemove = res.keys.filter(key => key.startsWith(CACHE_PREFIX))
+          const removePromises = keysToRemove.map(key => {
+            return new Promise((res) => {
+              wx.removeStorage({
+                key,
+                success: () => res(),
+                fail: () => res()
+              })
+            })
+          })
+          Promise.all(removePromises).then(() => resolve())
+        },
+        fail: (e) => {
+          console.error('Cache clear error:', e)
+          resolve()
+        }
+      })
+    })
   }
 }
 
