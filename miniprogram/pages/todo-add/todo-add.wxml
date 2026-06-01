@@ -1,0 +1,90 @@
+<view class="container">
+  <view class="form">
+    <view class="form-item">
+      <text class="label">标题</text>
+      <input class="input" placeholder="输入待办事项" value="{{title}}" bindinput="onTitleInput" focus="{{true}}" />
+    </view>
+
+    <view class="form-item">
+      <text class="label">日期</text>
+      <picker mode="date" value="{{dueDate}}" bindchange="onDateChange">
+        <view class="picker-value">{{dueDate || '选择日期'}}</view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <text class="label">时间</text>
+      <picker mode="time" value="{{dueTime}}" bindchange="onTimeChange">
+        <view class="picker-value">{{dueTime || '选择时间（可选）'}}</view>
+      </picker>
+    </view>
+
+    <view class="more-toggle" bindtap="toggleMore">
+      <text>{{showMore ? '收起选项' : '更多选项'}}</text>
+      <text class="toggle-arrow">{{showMore ? '▲' : '▼'}}</text>
+    </view>
+
+    <view class="advanced-options" wx:if="{{showMore}}">
+      <view class="form-item">
+        <text class="label">分类</text>
+        <view class="category-options">
+          <view wx:for="{{categories}}" wx:key="value" class="category-tag {{category === item.value ? 'active' : ''}}" bindtap="onCategorySelect" data-value="{{item.value}}">{{item.label}}</view>
+        </view>
+      </view>
+
+      <view class="form-item">
+        <text class="label">颜色</text>
+        <view class="color-options">
+          <view wx:for="{{colors}}" wx:key="value" class="color-tag {{color === item.value ? 'active' : ''}}" style="background: {{item.hex}}" bindtap="onColorSelect" data-value="{{item.value}}"></view>
+        </view>
+      </view>
+
+      <view class="form-item">
+        <text class="label">负责人</text>
+        <view class="assignee-options">
+          <view wx:for="{{members}}" wx:key="_id" class="assignee-tag {{assignedTo === item._id ? 'active' : ''}}" bindtap="onAssigneeSelect" data-id="{{item._id}}">{{item.name}}</view>
+        </view>
+      </view>
+
+      <view class="form-item">
+        <text class="label">重复</text>
+        <view class="repeat-options">
+          <view wx:for="{{repeatOptions}}" wx:key="value" class="repeat-tag {{repeat === item.value ? 'active' : ''}}" bindtap="onRepeatSelect" data-value="{{item.value}}">{{item.label}}</view>
+        </view>
+      </view>
+
+      <view class="form-item">
+        <text class="label">提醒通知</text>
+        <switch checked="{{enableNotification}}" bindchange="onNotificationChange" color="#4A90D9" />
+      </view>
+
+      <view class="form-item" wx:if="{{enableNotification}}">
+        <text class="label">提前提醒</text>
+        <view class="notify-options">
+          <view wx:for="{{notifyOptions}}" wx:key="value" class="notify-tag {{notifyBefore === item.value ? 'active' : ''}}" bindtap="onNotifySelect" data-value="{{item.value}}">{{item.label}}</view>
+        </view>
+      </view>
+
+      <view class="form-item" wx:if="{{category === 'shopping'}}">
+        <text class="label">数量</text>
+        <input class="input" placeholder="如：2颗、3斤" value="{{quantity}}" bindinput="onQuantityInput" />
+      </view>
+
+      <view class="form-item">
+        <text class="label">描述</text>
+        <textarea class="textarea" placeholder="补充说明（可选）" value="{{description}}" bindinput="onDescInput" />
+      </view>
+
+      <view class="form-item">
+        <view class="lunar-toggle">
+          <text class="label">使用农历</text>
+          <switch checked="{{isLunar}}" bindchange="onLunarChange" color="#4A90D9" />
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="submit-area">
+    <button class="btn-primary" bindtap="onSubmit" disabled="{{!title}}">保存</button>
+  </view>
+</view>
