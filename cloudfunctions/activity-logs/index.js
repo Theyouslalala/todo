@@ -28,16 +28,10 @@ async function getLogs(openid, event) {
 
   const familyGroupId = user.data[0].familyGroupId
 
-  const countRes = await db.collection('activity_logs')
-    .where({ familyGroupId })
-    .count()
-
-  const res = await db.collection('activity_logs')
-    .where({ familyGroupId })
-    .orderBy('createdAt', 'desc')
-    .skip(skip)
-    .limit(20)
-    .get()
+  const [countRes, res] = await Promise.all([
+    db.collection('activity_logs').where({ familyGroupId }).count(),
+    db.collection('activity_logs').where({ familyGroupId }).orderBy('createdAt', 'desc').skip(skip).limit(20).get()
+  ])
 
   const userIds = [...new Set(res.data.map(log => log.userId))]
   const users = await db.collection('users')

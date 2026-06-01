@@ -15,8 +15,7 @@ Component({
   observers: {
     'todo.dueDate': function(dueDate) {
       if (dueDate) {
-        const parts = dueDate.split('-').map(Number)
-        const info = lunar.solarToLunar(parts[0], parts[1], parts[2])
+        const info = lunar.fromDateStr(dueDate)
         this.setData({ lunarDateStr: info.monthName + '月' + info.dayName })
       }
     },

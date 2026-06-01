@@ -8,7 +8,8 @@ const api = {
     }
     const promise = this._execute(name, data)
     pendingRequests.set(key, promise)
-    promise.finally(() => pendingRequests.delete(key))
+    const timer = setTimeout(() => pendingRequests.delete(key), 30000)
+    promise.finally(() => { clearTimeout(timer); pendingRequests.delete(key) })
     return promise
   },
 
