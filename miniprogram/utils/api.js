@@ -1,19 +1,5 @@
-const pendingRequests = new Map()
-
 const api = {
   async call(name, data = {}) {
-    const key = JSON.stringify({ name, data })
-    if (pendingRequests.has(key)) {
-      return pendingRequests.get(key)
-    }
-    const promise = this._execute(name, data)
-    pendingRequests.set(key, promise)
-    const timer = setTimeout(() => pendingRequests.delete(key), 30000)
-    promise.finally(() => { clearTimeout(timer); pendingRequests.delete(key) })
-    return promise
-  },
-
-  async _execute(name, data = {}) {
     try {
       const app = getApp()
       if (app && app.globalData.testMode && app.globalData.testOpenid) {

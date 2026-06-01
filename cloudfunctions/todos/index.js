@@ -13,6 +13,8 @@ exports.main = async (event, context) => {
 
   try {
     switch (action) {
+      case 'ping':
+        return { code: 0, msg: 'pong' }
       case 'create':
         return await createTodo(openid, event, userCache)
       case 'update':

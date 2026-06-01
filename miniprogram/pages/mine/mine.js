@@ -11,11 +11,12 @@ Page({
 
   async onLoad() {
     await app.waitForLogin()
-    this.loadUserInfo()
+    this._dataLoaded = true
+    await this.loadUserInfo()
   },
 
   onShow() {
-    if (app.globalData.userInfo) {
+    if (this._dataLoaded && app.globalData.userInfo) {
       this.loadUserInfo()
     }
   },

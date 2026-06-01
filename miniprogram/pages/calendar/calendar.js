@@ -19,11 +19,12 @@ Page({
     await app.waitForLogin()
     const now = new Date()
     this.setData({ year: now.getFullYear(), month: now.getMonth() + 1 })
-    this.loadMonth()
+    this._dataLoaded = true
+    await this.loadMonth()
   },
 
   onShow() {
-    if (app.globalData.userInfo) {
+    if (this._dataLoaded && app.globalData.userInfo) {
       this.loadMonthTodos()
     }
   },

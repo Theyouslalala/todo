@@ -24,11 +24,13 @@ Page({
       lunarStr: '农历' + lunar.solarToLunar(now.getFullYear(), now.getMonth() + 1, now.getDate()).fullName,
       greeting: now.getHours() < 12 ? '早上好' : now.getHours() < 18 ? '下午好' : '晚上好'
     })
-    this.loadData()
+
+    this._dataLoaded = true
+    await this.loadData()
   },
 
   onShow() {
-    if (app.globalData.userInfo) {
+    if (this._dataLoaded && app.globalData.userInfo) {
       this.loadTodos()
     }
   },
@@ -50,19 +52,24 @@ Page({
   async loadTodos() {
     this.setData({ loading: true })
     const category = this.data.currentCategory
-    let res
-    if (this.data.viewMode === 'today') {
-      res = await api.todos.getToday()
-    } else {
-      res = await api.todos.getAll()
-    }
-    if (res && res.data) {
-      if (category !== 'all') {
-        res.data = res.data.filter(t => t.category === category)
+    try {
+      let res
+      if (this.data.viewMode === 'today') {
+        res = await api.todos.getToday()
+      } else {
+        res = await api.todos.getAll()
       }
-      this.setData({ todos: res.data, loading: false })
-      await cache.set('today_todos', res.data)
-    } else {
+      if (res && res.data) {
+        if (category !== 'all') {
+          res.data = res.data.filter(t => t.category === category)
+        }
+        this.setData({ todos: res.data, loading: false })
+        await cache.set('today_todos', res.data)
+      } else {
+        this.setData({ loading: false })
+      }
+    } catch (err) {
+      console.error('loadTodos failed:', err)
       this.setData({ loading: false })
     }
   },

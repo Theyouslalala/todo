@@ -22,7 +22,6 @@ App({
 
       if (res.result.code === 0) {
         this.globalData.userInfo = res.result.data
-        console.log('User logged in:', res.result.data.name)
       } else {
         res = await wx.cloud.callFunction({
           name: 'users',
@@ -31,7 +30,6 @@ App({
 
         if (res.result.code === 0) {
           this.globalData.userInfo = res.result.data
-          console.log('User auto-registered:', res.result.data.name)
         }
       }
     } catch (err) {
