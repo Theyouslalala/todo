@@ -1,5 +1,5 @@
-<view class="todo-card priority-{{todo.priority}} {{todo.status === 'completed' ? 'completed' : ''}} {{expanded ? 'expanded' : ''}}"
-  bindlongpress="onLongPress" bindtap="onCardTap">
+<view class="todo-card priority-{{todo.priority}} {{todo.status === 'completed' ? 'completed' : ''}}"
+  bindtap="onCardTap">
   <view class="color-bar" style="background: {{todo.color === 'red' ? '#ff4d4f' : todo.color === 'green' ? '#52c41a' : todo.color === 'yellow' ? '#faad14' : '#4A90D9'}}"></view>
   <view class="card-content">
     <view class="card-header">
