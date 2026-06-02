@@ -6,7 +6,8 @@ Page({
   data: {
     userInfo: {},
     roleName: '',
-    debugTapCount: 0
+    debugTapCount: 0,
+    loading: true
   },
 
   async onLoad() {
@@ -22,13 +23,20 @@ Page({
   },
 
   async loadUserInfo() {
-    const res = await api.users.getUserInfo()
-    if (res && res.data) {
-      app.globalData.userInfo = res.data
-      this.setData({
-        userInfo: res.data,
-        roleName: ROLE_MAP[res.data.role] || '成员'
-      })
+    this.setData({ loading: true })
+    try {
+      const res = await api.users.getUserInfo()
+      if (res && res.data) {
+        app.globalData.userInfo = res.data
+        this.setData({
+          userInfo: res.data,
+          roleName: ROLE_MAP[res.data.role] || '成员'
+        })
+      }
+    } catch (e) {
+      wx.showToast({ title: '加载失败', icon: 'none' })
+    } finally {
+      this.setData({ loading: false })
     }
   },
 

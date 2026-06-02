@@ -98,13 +98,21 @@ Page({
     }
   },
 
-  async onTodoDelete(e) {
+  onTodoDelete(e) {
     const { todoId } = e.detail
-    const res = await api.todos.delete(todoId)
-    if (res && res.code === 0) {
-      wx.showToast({ title: '已删除', icon: 'success' })
-      this.loadTodos()
-    }
+    wx.showModal({
+      title: '确认删除',
+      content: '删除后可在回收站恢复',
+      success: async (res) => {
+        if (res.confirm) {
+          const result = await api.todos.delete(todoId)
+          if (result && result.code === 0) {
+            wx.showToast({ title: '已删除', icon: 'success' })
+            this.loadTodos()
+          }
+        }
+      }
+    })
   },
 
   onQuickAdd() {

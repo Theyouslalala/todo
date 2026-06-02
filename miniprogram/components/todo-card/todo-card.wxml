@@ -20,9 +20,9 @@
         <view class="assignee-avatar">{{_assigneeName || '?'}}</view>
       </view>
     </view>
-    <view class="card-actions" wx:if="{{expanded}}">
-      <view class="action-btn action-complete" catchtap="onComplete" data-action="complete">完成</view>
-      <view class="action-btn action-delete" catchtap="onDelete" data-action="delete">删除</view>
+    <view class="card-actions" wx:if="{{todo.status === 'pending'}}">
+      <view class="action-btn action-complete" catchtap="onComplete">完成</view>
+      <view class="action-btn action-delete" catchtap="onDelete">删除</view>
     </view>
   </view>
 </view>

@@ -7,7 +7,6 @@ Component({
   },
 
   data: {
-    expanded: false,
     lunarDateStr: '',
     _assigneeName: ''
   },
@@ -39,22 +38,13 @@ Component({
   },
 
   methods: {
-    onLongPress() {
-      this.setData({ expanded: !this.data.expanded })
-    },
-    onCardTap(e) {
-      if (this.data.expanded) {
-        this.setData({ expanded: false })
-        return
-      }
+    onCardTap() {
       this.triggerEvent('todotap', { todo: this.data.todo })
     },
     onComplete() {
-      this.setData({ expanded: false })
       this.triggerEvent('complete', { todoId: this.data.todo._id })
     },
     onDelete() {
-      this.setData({ expanded: false })
       this.triggerEvent('delete', { todoId: this.data.todo._id })
     }
   }

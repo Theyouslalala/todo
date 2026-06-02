@@ -25,6 +25,8 @@ exports.main = async (event, context) => {
         return await restoreTodo(openid, event, userCache)
       case 'complete':
         return await completeTodo(openid, event, userCache)
+      case 'uncomplete':
+        return await uncompleteTodo(openid, event, userCache)
       case 'getToday':
         return await getTodayTodos(openid, userCache)
       case 'getByDate':
@@ -187,6 +189,21 @@ async function completeTodo(openid, event, cache) {
   console.log('[todos] Completed todo:', todoId, 'by', openid)
   logActivity(user.familyGroupId, user._id, 'complete', ownership.todo.title, `完成了待办: ${ownership.todo.title}`)
   return { code: 0, msg: 'Completed' }
+}
+
+async function uncompleteTodo(openid, event, cache) {
+  const user = await getUserAndFamily(openid, cache)
+  const { todoId } = event
+
+  const ownership = await verifyOwnership(todoId, user.familyGroupId)
+  if (ownership.error) return ownership.error
+
+  await db.collection('reminders').doc(todoId).update({
+    data: { status: 'pending', completedAt: null, updatedAt: db.serverDate() }
+  })
+  console.log('[todos] Uncompleted todo:', todoId, 'by', openid)
+  logActivity(user.familyGroupId, user._id, 'uncomplete', ownership.todo.title, `撤销完成: ${ownership.todo.title}`)
+  return { code: 0, msg: 'Uncompleted' }
 }
 
 function getLocalDate() {

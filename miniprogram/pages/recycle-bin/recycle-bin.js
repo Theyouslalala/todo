@@ -1,13 +1,20 @@
 const api = require('../../utils/api')
 
 Page({
-  data: { deletedTodos: [] },
+  data: { deletedTodos: [], loading: true },
   onLoad() { this.loadDeleted() },
   async loadDeleted() {
-    const res = await api.todos.getDeleted()
-    if (res && res.data) {
-      const deletedTodos = res.data.map(t => ({ ...t, deletedAtStr: t.deletedAt ? new Date(t.deletedAt).toLocaleString() : '' }))
-      this.setData({ deletedTodos })
+    this.setData({ loading: true })
+    try {
+      const res = await api.todos.getDeleted()
+      if (res && res.data) {
+        const deletedTodos = res.data.map(t => ({ ...t, deletedAtStr: t.deletedAt ? new Date(t.deletedAt).toLocaleString() : '' }))
+        this.setData({ deletedTodos })
+      }
+    } catch (e) {
+      wx.showToast({ title: '加载失败', icon: 'none' })
+    } finally {
+      this.setData({ loading: false })
     }
   },
   async onRestore(e) {

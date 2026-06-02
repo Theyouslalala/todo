@@ -1,10 +1,26 @@
 <view class="container">
-  <view class="invite-section">
+  <!-- New user guidance -->
+  <view class="guide-section" wx:if="{{!hasFamily && !loading}}">
+    <view class="guide-icon">👨‍👩‍👧</view>
+    <text class="guide-title">还没有加入家庭</text>
+    <text class="guide-desc">创建家庭或输入邀请码加入已有家庭</text>
+    <button class="btn-primary" bindtap="onCreateFamily">创建家庭</button>
+    <view class="guide-divider">
+      <text class="divider-line"></text>
+      <text class="divider-text">或</text>
+      <text class="divider-line"></text>
+    </view>
+  </view>
+
+  <!-- Invite code section -->
+  <view class="invite-section" wx:if="{{hasFamily}}">
     <text class="invite-label">邀请码</text>
     <text class="invite-code">{{inviteCode}}</text>
     <button class="btn-copy" bindtap="copyCode">复制</button>
   </view>
-  <view class="members-section">
+
+  <!-- Members section -->
+  <view class="members-section" wx:if="{{hasFamily}}">
     <text class="section-title">家庭成员</text>
     <view class="member-item" wx:for="{{members}}" wx:key="_id">
       <view class="member-avatar">{{item.name[0] || '?'}}</view>
@@ -12,8 +28,13 @@
       <text class="member-role {{item.role === 'admin' ? 'role-admin' : ''}}">{{item.role === 'admin' ? '管理员' : '成员'}}</text>
     </view>
   </view>
+
+  <!-- Join section -->
   <view class="join-section">
-    <input class="join-input" placeholder="输入邀请码加入家庭" value="{{joinCode}}" bindinput="onJoinInput" />
-    <button class="btn-primary" bindtap="onJoin">加入</button>
+    <text class="section-title" wx:if="{{!hasFamily}}">加入已有家庭</text>
+    <view class="join-input-row">
+      <input class="join-input" placeholder="输入邀请码" value="{{joinCode}}" bindinput="onJoinInput" />
+      <button class="btn-primary btn-join" bindtap="onJoin">加入</button>
+    </view>
   </view>
 </view>

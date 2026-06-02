@@ -24,6 +24,7 @@ const api = {
     delete: (todoId) => api.call('todos', { action: 'delete', todoId }),
     restore: (todoId) => api.call('todos', { action: 'restore', todoId }),
     complete: (todoId) => api.call('todos', { action: 'complete', todoId }),
+    uncomplete: (todoId) => api.call('todos', { action: 'uncomplete', todoId }),
     getToday: () => api.call('todos', { action: 'getToday' }),
     getByDate: (date) => api.call('todos', { action: 'getByDate', date }),
     getByMonth: (year, month) => api.call('todos', { action: 'getByMonth', year, month }),

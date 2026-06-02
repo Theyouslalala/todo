@@ -14,9 +14,15 @@
     <view class="detail-row" wx:if="{{todo.description}}"><text class="row-label">描述</text><text class="row-value desc">{{todo.description}}</text></view>
     <view class="detail-row"><text class="row-label">通知</text><text class="row-value">{{todo.enableNotification !== false ? '已开启' : '已关闭'}}</text></view>
   </view>
+  <!-- Pending actions -->
   <view class="action-area" wx:if="{{todo.status === 'pending'}}">
     <button class="btn-primary" bindtap="onComplete">标记完成</button>
     <button class="btn-edit" bindtap="onEdit">编辑</button>
+    <button class="btn-danger" bindtap="onDelete">删除</button>
+  </view>
+  <!-- Completed actions -->
+  <view class="action-area" wx:if="{{todo.status === 'completed'}}">
+    <button class="btn-edit" bindtap="onUncomplete">撤销完成</button>
     <button class="btn-danger" bindtap="onDelete">删除</button>
   </view>
 </view>

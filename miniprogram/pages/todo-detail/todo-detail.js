@@ -5,15 +5,22 @@ const { CATEGORY_MAP, REPEAT_MAP, COLOR_MAP } = require('../../utils/constants')
 Page({
   data: {
     todo: {}, categoryName: '', assigneeName: '', repeatName: '', lunarDateStr: '',
-    colorMap: COLOR_MAP
+    colorMap: COLOR_MAP,
+    loading: true
   },
   onLoad(options) {
     this.todoId = options.id
     this.loadTodo()
   },
   async loadTodo() {
-    const res = await api.todos.getById(this.todoId)
-    if (res && res.data) {
+    this.setData({ loading: true })
+    try {
+      const res = await api.todos.getById(this.todoId)
+      if (!res || !res.data) {
+        wx.showToast({ title: '待办不存在', icon: 'none' })
+        setTimeout(() => { wx.navigateBack() }, 1500)
+        return
+      }
       const todo = res.data
       const membersRes = await api.users.getFamilyMembers()
       const members = membersRes && membersRes.data ? membersRes.data : []
@@ -30,11 +37,19 @@ Page({
         repeatName: REPEAT_MAP[todo.repeat] || '不重复',
         lunarDateStr
       })
+    } catch (e) {
+      wx.showToast({ title: '加载失败', icon: 'none' })
+    } finally {
+      this.setData({ loading: false })
     }
   },
   async onComplete() {
     const res = await api.todos.complete(this.todoId)
     if (res && res.code === 0) { wx.showToast({ title: '已完成', icon: 'success' }); this.loadTodo() }
+  },
+  async onUncomplete() {
+    const res = await api.todos.uncomplete(this.todoId)
+    if (res && res.code === 0) { wx.showToast({ title: '已撤销完成', icon: 'success' }); this.loadTodo() }
   },
   onEdit() { wx.navigateTo({ url: `/pages/todo-add/todo-add?id=${this.todoId}&mode=edit` }) },
   async onDelete() {

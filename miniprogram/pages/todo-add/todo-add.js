@@ -26,7 +26,8 @@ Page({
     categories: CATEGORIES,
     colors: COLORS,
     repeatOptions: REPEAT_OPTIONS,
-    notifyOptions: NOTIFY_OPTIONS
+    notifyOptions: NOTIFY_OPTIONS,
+    submitting: false
   },
 
   onLoad(options) {
@@ -45,7 +46,9 @@ Page({
   },
 
   async loadTodo() {
+    wx.showLoading({ title: '加载中...' })
     const res = await api.todos.getById(this.todoId)
+    wx.hideLoading()
     if (res && res.data) {
       const todo = res.data
       this.setData({
@@ -99,9 +102,13 @@ Page({
   toggleMore() { this.setData({ showMore: !this.data.showMore }) },
 
   async onSubmit() {
+    if (this.data.submitting) return
+    this.setData({ submitting: true })
+
     const { title, dueDate } = this.data
-    if (!title || !dueDate) {
+    if (!title.trim() || !dueDate) {
       wx.showToast({ title: '请填写标题和日期', icon: 'none' })
+      this.setData({ submitting: false })
       return
     }
 
@@ -149,6 +156,9 @@ Page({
         }
       }
       setTimeout(() => { wx.navigateBack() }, 1500)
+    } else {
+      wx.showToast({ title: '保存失败，请重试', icon: 'none' })
     }
+    this.setData({ submitting: false })
   }
 })
